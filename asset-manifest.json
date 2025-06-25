@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.2c4dd701.css",
-    "main.js": "/static/js/main.5ba54e1b.js",
-    "static/js/453.419a5d54.chunk.js": "/static/js/453.419a5d54.chunk.js",
-    "static/media/NottieLogo.png": "/static/media/NottieLogo.7ed28e8c6dc6f4aff046.png",
-    "static/media/Logo.png": "/static/media/Logo.8d98dc4c107c6adfb695.png",
-    "index.html": "/index.html",
-    "main.2c4dd701.css.map": "/static/css/main.2c4dd701.css.map",
-    "main.5ba54e1b.js.map": "/static/js/main.5ba54e1b.js.map",
-    "453.419a5d54.chunk.js.map": "/static/js/453.419a5d54.chunk.js.map"
+    "main.css": "/fyp/static/css/main.2c4dd701.css",
+    "main.js": "/fyp/static/js/main.6065a84e.js",
+    "static/js/453.419a5d54.chunk.js": "/fyp/static/js/453.419a5d54.chunk.js",
+    "static/media/NottieLogo.png": "/fyp/static/media/NottieLogo.7ed28e8c6dc6f4aff046.png",
+    "static/media/Logo.png": "/fyp/static/media/Logo.8d98dc4c107c6adfb695.png",
+    "index.html": "/fyp/index.html",
+    "main.2c4dd701.css.map": "/fyp/static/css/main.2c4dd701.css.map",
+    "main.6065a84e.js.map": "/fyp/static/js/main.6065a84e.js.map",
+    "453.419a5d54.chunk.js.map": "/fyp/static/js/453.419a5d54.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.2c4dd701.css",
-    "static/js/main.5ba54e1b.js"
+    "static/js/main.6065a84e.js"
   ]
 }
