@@ -7,7 +7,13 @@ exports.up = function (knex) {
     .dropTableIfExists('todos')
     .dropTableIfExists('notes')
     .dropTableIfExists('users')
-    .dropTableIfExists('folders');
+    .dropTableIfExists('lists')
+    .dropTableIfExists('folders')
+    .dropTableIfExists('quiz_questions')
+    .dropTableIfExists('quizzes')
+    .dropTableIfExists('materials')
+    .dropTableIfExists('user_categories')
+    .dropTableIfExists('categories');
 };
 
 /**

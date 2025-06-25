@@ -20,7 +20,7 @@ const CreateNote = () => {
       });
 
       if (response.ok) {
-        navigate('/note'); // Redirect to Notes Page after saving
+        navigate('/note');
       } else {
         console.error('Error creating note:', response.statusText);
       }

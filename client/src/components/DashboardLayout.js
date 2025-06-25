@@ -1,44 +1,35 @@
 import {useContext, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {UserContext} from '../context/UserContext';
+import {ThemeContext} from '../context/ThemeContext';
 import {FaHome, FaTasks, FaCog, FaUserCircle} from 'react-icons/fa';
+import {GrResources} from 'react-icons/gr';
 import {PiNotebookFill} from 'react-icons/pi';
-import {FiSearch, FiMoon, FiSun, FiBell, FiSettings} from 'react-icons/fi';
+import {FiSearch, FiMoon, FiSun, FiSettings} from 'react-icons/fi';
 import NottieLogo from '../assets/NottieLogo.png';
 import Logo from '../assets/Logo.png';
-import {ThemeContext} from '../context/ThemeContext';
+import {SearchContext} from '../context/SearchContext';
 
 const DashboardLayout = ({children}) => {
-  const {user, setUser} = useContext(UserContext);
+  const {user} = useContext(UserContext);
   const {theme, toggleTheme} = useContext(ThemeContext);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const {searchQuery, setSearchQuery} = useContext(SearchContext);
+
+  const isDark = theme === 'dark';
 
   const handleLogout = async () => {
-    const confirmLogout = window.confirm('Are you sure you want to log out?');
-    if (!confirmLogout) return;
-
+    if (!window.confirm('Are you sure you want to log out?')) return;
     try {
       const response = await fetch('http://localhost:5000/api/logout', {
         method: 'POST',
-        credentials: 'include', // Ensures session cookies are sent
-        // headers: {
-        //   'Content-Type': 'application/json',
-        // },
+        credentials: 'include',
       });
-
       if (!response.ok) throw new Error('Logout failed');
-
-      console.log('Logout successful');
-
-      // Clear localStorage/sessionStorage (if needed)
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('role');
-
-      // Redirect to login page
+      localStorage.clear();
+      sessionStorage.clear();
       navigate('/login');
     } catch (error) {
       console.error('Error logging out:', error);
@@ -47,113 +38,100 @@ const DashboardLayout = ({children}) => {
   };
 
   return (
-    // <div className="flex bg-white text-black">
     <div
       className={`grid grid-cols-[auto_1fr] h-screen ${
-        theme === 'dark' ? 'bg-[#181818] text-[#EAEAEA]' : 'bg-white text-black'
+        isDark ? 'bg-[#181818] text-[#EAEAEA]' : 'bg-[#F5F5F5] text-black'
       }`}>
       {/* Sidebar */}
-      {/* <div
-        className={`h-screen bg-gray-100 bg-opacity-90 backdrop-blur-lg shadow-lg relative flex flex-col items-start ${
-          sidebarOpen ? 'w-64' : 'w-16'
-        } `}> */}
       <div
         className={`h-full ${
-          theme === 'dark' ? 'bg-[#1F1F1F]' : 'bg-gray-100'
-        } shadow-lg flex flex-col ${sidebarOpen ? 'w-64' : 'w-16'}`}>
+          theme === 'dark'
+            ? 'bg-gradient-to-b from-[#1F1F1F] to-[#121212]'
+            : 'bg-gradient-to-b from-gray-100 to-gray-200'
+        } shadow-xl flex flex-col transition-all duration-300 ease-in-out ${
+          sidebarOpen ? 'w-64' : 'w-20'
+        } overflow-hidden rounded-tr-3xl rounded-br-3xl`}>
         <button
-          className="h-16 flex items-center px-4 w-full"
+          className="h-20 flex items-center justify-center"
           onClick={() => setSidebarOpen(!sidebarOpen)}>
-          {sidebarOpen ? (
-            <img
-              src={NottieLogo}
-              alt="Nottie Full Logo"
-              // className="w-40 transition-all duration-300"
-              className={`w-40 transition-all duration-300 ${
-                theme === 'dark' ? 'invert' : ''
-              }`}
-            />
-          ) : (
-            <img
-              src={Logo}
-              alt="Nottie Logo"
-              // className="w-12 transition-all duration-300"
-              className={`w-12 transition-all duration-300 ${
-                theme === 'dark' ? 'invert' : ''
-              }`}
-            />
-          )}
+          <img
+            src={sidebarOpen ? NottieLogo : Logo}
+            alt="Nottie Logo"
+            className={`transition-all duration-300 ${
+              theme === 'dark' ? 'invert' : ''
+            } ${sidebarOpen ? 'w-40' : 'w-12'}`}
+          />
         </button>
 
-        <nav
-          className={`flex flex-col gap-2 w-full ${
-            sidebarOpen ? 'pt-6' : 'pt-4'
-          }`}>
+        <div className="border-t border-gray-300 opacity-20 mx-4 my-2" />
+
+        <nav className="flex flex-col gap-2 mt-6">
           {[
             {label: 'Home', icon: <FaHome />, path: '/home'},
             {label: 'Notes', icon: <PiNotebookFill />, path: '/note'},
             {label: 'To-Do List', icon: <FaTasks />, path: '/todos'},
-            {label: 'Settings', icon: <FaCog />, path: '/settings'},
+            {
+              label: 'Online Resources',
+              icon: <GrResources />,
+              path: '/online-resources',
+            },
           ].map(({label, icon, path}) => (
             <button
               key={label}
               onClick={() => navigate(path)}
-              // className={`flex items-center p-[12px_20px] text-[18px] cursor-pointer transition-all duration-300 ease-in-out rounded-md hover:bg-gray-200 hover:bg-opacity-50 ${
-              //   sidebarOpen ? 'gap-3' : 'justify-center'
-              // }`}>
-              className={`flex items-center p-[12px_20px] text-[18px] cursor-pointer rounded-md transition-all duration-300 ease-in-out ${
-                theme === 'dark' ? 'hover:bg-[#333333]' : 'hover:bg-gray-200'
-              } ${sidebarOpen ? 'gap-3' : 'justify-center'}`}>
-              <span className="text-[20px]">{icon}</span>{' '}
-              {/* Icon always visible */}
-              {sidebarOpen && (
-                <span className="whitespace-nowrap">{label}</span>
-              )}
+              className={`flex items-center ${
+                sidebarOpen ? 'px-6' : 'px-2'
+              } py-3 rounded-lg mx-3 gap-4 text-[18px] font-sm transition-all duration-200 hover:scale-[1.02] ${
+                theme === 'dark'
+                  ? 'hover:bg-[#2a2a2a]'
+                  : 'hover:bg-gray-300 hover:bg-opacity-40'
+              } ${
+                window.location.pathname === path
+                  ? theme === 'dark'
+                    ? 'bg-[#333333] text-white'
+                    : 'bg-white shadow-md text-black'
+                  : ''
+              }`}>
+              <span className="text-[22px]">{icon}</span>
+              {sidebarOpen && <span>{label}</span>}
             </button>
           ))}
         </nav>
       </div>
 
       {/* Main Content */}
-      <div className="overflow-y-auto p-4">
+      <div className="flex flex-col overflow-y-auto">
         {/* Header */}
-        {/* <div className="flex items-center justify-between p-4 shadow-md bg-white"> */}
-        <div
+        <header
           className={`flex items-center justify-between p-4 shadow-md ${
-            theme === 'dark'
-              ? 'bg-[#242424] text-[#EAEAEA]'
-              : 'bg-white text-black'
+            isDark ? 'bg-[#242424]' : 'bg-white'
           }`}>
-          {/* Search Bar */}
+          {/* Search */}
           <div className="flex items-center gap-2 w-96">
             <FiSearch className="text-gray-500" />
             <input
               type="text"
               placeholder="Search..."
-              // className="border-2 outline-none bg-transparent text-black w-full p-2"
-              className={`border-2 outline-none bg-transparent w-full p-2 ${
-                theme === 'dark'
-                  ? 'text-[#EAEAEA] border-[#333333]'
+              onChange={e => setSearchQuery(e.target.value)}
+              className={`w-full p-2 border-2 rounded-md outline-none bg-transparent ${
+                isDark
+                  ? 'text-[#EAEAEA] border-[#333]'
                   : 'text-black border-gray-300'
-              }`}
+              } focus:border-blue-400`}
             />
           </div>
 
-          {/* Icons & Profile */}
+          {/* Actions */}
           <div className="flex items-center gap-4">
             <button onClick={toggleTheme} className="text-gray-500">
               {theme === 'light' ? <FiMoon /> : <FiSun />}
             </button>
-            <FiBell className="text-gray-500" />
-            <FiSettings className="text-gray-500" />
-
-            {/* Profile Section */}
+            {/* Profile Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                // className="text-gray-700 text-2xl w-10 h-10 flex items-center justify-center rounded-full bg-gray-300">
-                className={`text-gray-700 text-2xl w-10 h-10 flex items-center justify-center rounded-full ${
-                  theme === 'dark' ? 'bg-[#333333] text-white' : 'bg-gray-300'
+                className={`w-10 h-10 flex items-center justify-center rounded-full ${
+                  isDark ? 'bg-[#333] text-white' : 'bg-gray-300 text-gray-700'
                 }`}>
                 {user ? (
                   user.username.charAt(0).toUpperCase()
@@ -162,27 +140,26 @@ const DashboardLayout = ({children}) => {
                 )}
               </button>
 
-              {/* Dropdown Menu */}
               {dropdownOpen && (
-                // <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg">
                 <div
-                  className={`absolute right-0 mt-2 w-48 border rounded-md shadow-lg ${
-                    theme === 'dark'
-                      ? 'bg-[#333333] text-[#EAEAEA] border-[#444]'
+                  className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg border ${
+                    isDark
+                      ? 'bg-[#333] text-[#EAEAEA] border-[#444]'
                       : 'bg-white text-black border-gray-200'
                   }`}>
                   <button
-                    // className="block w-full px-4 py-2 text-left hover:bg-gray-200"
                     className={`block w-full px-4 py-2 text-left transition ${
-                      theme === 'dark' ? 'hover:bg-[#444]' : 'hover:bg-gray-100'
+                      isDark ? 'hover:bg-[#444]' : 'hover:bg-gray-100'
                     }`}
-                    onClick={() => navigate('/profile')}>
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      navigate('/profile');
+                    }}>
                     Edit Profile
                   </button>
                   <button
-                    // className="block w-full px-4 py-2 text-left text-red-600 hover:bg-gray-200"
-                    className={`block w-full px-4 py-2 text-left transition text-red-600 ${
-                      theme === 'dark'
+                    className={`block w-full px-4 py-2 text-left text-red-600 transition ${
+                      isDark
                         ? 'hover:bg-[#444] hover:text-red-400'
                         : 'hover:bg-red-100'
                     }`}
@@ -193,7 +170,7 @@ const DashboardLayout = ({children}) => {
               )}
             </div>
           </div>
-        </div>
+        </header>
 
         {/* Page Content */}
         <main className="p-6 flex-1">{children}</main>

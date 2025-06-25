@@ -1,18 +1,46 @@
 const express = require('express');
 const cors = require('cors');
-const bcrypt = require('bcryptjs'); // ✅ Import bcrypt
+const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const userRoutes = require('./routes/userRoutes');
 const db = require('../server/db/db');
-const profileRoutes = require('./routes/profileRoutes'); // ✅ Import profile routes
+const profileRoutes = require('./routes/profileRoutes');
+const lecturerRoutes = require('./routes/lecturerRoutes');
 const {ensureAuthenticated} = require('./middleware/authMiddleware');
+const categoryRoutes = require('./routes/categoryRoutes');
 const multer = require('multer');
 const Tesseract = require('tesseract.js');
 const fs = require('fs').promises;
+const {spawn} = require('child_process');
+const sharp = require('sharp');
 
 const app = express();
+
+function runPythonOCR(imagePath) {
+  return new Promise((resolve, reject) => {
+    console.log('🐍 Running Python OCR:', imagePath);
+    const python = spawn('python', ['ocr_processor.py', imagePath]);
+
+    let result = '';
+
+    python.stdout.on('data', data => {
+      console.log('📤 Python output:', data.toString());
+      result += data.toString();
+    });
+
+    python.stderr.on('data', data => {
+      console.error('❌ Python error:', data.toString());
+    });
+
+    python.on('close', code => {
+      console.log('📥 Python exited with code:', code);
+      if (code === 0) resolve(result.trim());
+      else reject(new Error('Python script failed'));
+    });
+  });
+}
 
 app.use(
   session({
@@ -27,14 +55,13 @@ app.use(
   cors({
     origin: 'http://localhost:3000', // Explicitly allow frontend URL
     credentials: true, // Allow cookies/sessions
-    // methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow required HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allow necessary headers
   }),
 );
 
 app.get('/api/user', ensureAuthenticated, async (req, res) => {
   try {
-    const userId = req.user.userId; // Assuming session-based auth
+    const userId = req.user.userId;
     if (!userId) return res.status(401).json({message: 'Unauthorized'});
 
     const [user] = await db
@@ -44,7 +71,7 @@ app.get('/api/user', ensureAuthenticated, async (req, res) => {
     if (user.length === 0)
       return res.status(404).json({message: 'User not found'});
 
-    res.json(user[0]); // Returns { username: 'JohnDoe' }
+    res.json(user[0]);
   } catch (error) {
     console.error(error);
     res.status(500).json({message: 'Server error'});
@@ -57,7 +84,7 @@ app.use(passport.session());
 
 passport.use(
   new LocalStrategy({usernameField: 'email'}, (email, password, done) => {
-    const sql = 'SELECT * FROM users WHERE email = ? '; // Query to fetch user
+    const sql = 'SELECT * FROM users WHERE email = ? ';
     db.query(sql, [email], (err, results) => {
       if (err) {
         return done(err);
@@ -94,62 +121,53 @@ passport.deserializeUser((id, done) => {
 });
 
 app.use('/api', profileRoutes);
-
 app.use('/api', userRoutes);
+app.use('/api', categoryRoutes);
+app.use('/uploads', express.static('uploads'));
+app.use('/api/lecturer', lecturerRoutes);
 
 const upload = multer({dest: 'uploads/'});
-// app.post('/api/ocr', upload.single('image'), async (req, res) => {
-//   if (!req.file) {
-//     return res.status(400).json({error: 'No image uploaded'});
-//   }
 
-//   try {
-//     const {
-//       data: {text},
-//     } = await Tesseract.recognize(req.file.path, 'eng');
-//     fs.unlinkSync(req.file.path); // Delete uploaded image after processing
-//     res.json({text});
-//   } catch (error) {
-//     res.status(500).json({error: 'OCR processing failed'});
-//   }
-// });
+async function fallbackTesseractOCR(imagePath) {
+  const buffer = await sharp(imagePath).grayscale().toBuffer();
+  const {
+    data: {text},
+  } = await Tesseract.recognize(buffer, 'eng');
+  return text;
+}
 app.post('/api/ocr', upload.single('image'), async (req, res) => {
-  console.log('📸 Received OCR request');
+  if (!req.file) return res.status(400).json({error: 'No image uploaded'});
 
-  if (!req.file) {
-    console.error('❌ No image uploaded');
-    return res.status(400).json({error: 'No image uploaded'});
-  }
-
-  console.log(`📂 Uploaded file path: ${req.file.path}`);
+  const imagePath = req.file.path;
+  let text = '';
 
   try {
-    // Read file as Base64
-    const imageBuffer = await fs.readFile(req.file.path);
-    const imageBase64 = imageBuffer.toString('base64');
+    text = await runPythonOCR(imagePath);
 
-    // Process OCR
-    const {
-      data: {text},
-    } = await Tesseract.recognize(Buffer.from(imageBase64, 'base64'), 'eng');
+    if (!text || text.trim().length < 5 || !/[a-zA-Z]{3,}/.test(text)) {
+      console.warn('⚠️ Weak Python OCR result. Fallback to Tesseract...');
+      text = await fallbackTesseractOCR(imagePath);
+    }
 
-    console.log('✅ OCR result:', text);
+    const lines = text
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean); // clean and remove empty lines
+    const cleaned = lines.join(' '); // Combine full cleaned content
 
-    // Delete file after processing
-    await fs.unlink(req.file.path);
+    let title = lines[0] || 'Untitled Note';
+    if (title.length > 60) {
+      title = title.slice(0, 60) + '...';
+    }
 
-    const cleanedText = text.replace(/\s+/g, ' ').trim(); // ✅ Remove extra spaces
-    const title =
-      cleanedText.length > 20
-        ? cleanedText.substring(0, 20) + '...'
-        : cleanedText; // ✅ Get first 20 chars
-
-    res.json({title, text});
-  } catch (error) {
-    console.error('❌ OCR processing failed:', error);
-    res
-      .status(500)
-      .json({error: 'OCR processing failed', details: error.message});
+    res.json({title, text: cleaned});
+  } catch (err) {
+    console.error('❌ OCR failed:', err);
+    res.status(500).json({error: 'OCR failed', details: err.message});
+  } finally {
+    fs.unlink(imagePath).catch(e =>
+      console.warn('⚠️ Failed to delete temp file:', e.message),
+    );
   }
 });
 

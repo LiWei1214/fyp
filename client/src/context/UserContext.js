@@ -4,7 +4,7 @@ export const UserContext = createContext();
 
 const UserProvider = ({children}) => {
   const [user, setUser] = useState(null);
-  const token = localStorage.getItem('token'); // Retrieve token from local storage
+  const token = localStorage.getItem('token');
 
   // Fetch user profile data on app load
   useEffect(() => {

@@ -50,6 +50,16 @@ const register = async (req, res) => {
 // Login API
 const login = async (req, res) => {
   const {email, password} = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({error: 'Email and password are required'});
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({error: 'Invalid email format'});
+  }
+
   const query = 'SELECT * FROM users WHERE email = ?';
 
   db.query(query, [email], async (err, results) => {
@@ -72,7 +82,7 @@ const login = async (req, res) => {
       {expiresIn: '90d'},
     );
 
-    let redirectUrl = '/dashboard';
+    let redirectUrl = '/unauthorized';
     if (user.role === 'student') {
       redirectUrl = '/dashboard/student';
     } else if (user.role === 'lecturer') {

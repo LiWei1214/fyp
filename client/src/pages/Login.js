@@ -1,11 +1,14 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
+import {UserContext} from '../context/UserContext';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({email: '', password: ''});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const {setUser} = useContext(UserContext);
+
   const navigate = useNavigate();
 
   const handleChange = e => {
@@ -28,6 +31,15 @@ const Login = () => {
 
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
+
+      const profileRes = await axios.get('http://localhost:5000/api/profile', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+
+      setUser(profileRes.data);
 
       if (role === 'student') {
         navigate('/home');

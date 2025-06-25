@@ -1,13 +1,6 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-// exports.ensureAuthenticated = (req, res, next) => {
-//   if (req.isAuthenticated()) {
-//     return next();
-//   }
-//   res.status(401).json({error: 'Unauthorized: Please log in'});
-// };
-
 exports.ensureAuthenticated = (req, res, next) => {
   // Get the token from the request header
   const authHeader = req.header('Authorization');
