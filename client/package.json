@@ -2,7 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://liwei1214.github.io/fyp",
+  "homepage": "https://liwei1214.github.io",
   "dependencies": {
     "@shadcn/ui": "^0.0.4",
     "@tailwindcss/vite": "^4.0.9",
