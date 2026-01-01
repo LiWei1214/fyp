@@ -30,6 +30,7 @@
     "opencv4nodejs": "^5.6.0",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
+    "pg": "^8.16.3",
     "rimraf": "^6.0.1",
     "sharp": "^0.34.1",
     "tesseract.js": "^6.0.0",
