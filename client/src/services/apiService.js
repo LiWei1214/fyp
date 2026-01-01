@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = 'https://fyp-mhj8.onrender.com';
 
 // Set up Axios with credentials for authentication (JWT)
 const axiosInstance = axios.create({
