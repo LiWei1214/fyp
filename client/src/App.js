@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import LecturerDashboard from './pages/LecturerDashboard';
@@ -23,7 +23,7 @@ function App() {
     <SearchProvider>
       <ThemeProvider>
         <UserProvider>
-          <Router basename="/fyp">
+          <Router>
             <Routes>
               <Route
                 element={
