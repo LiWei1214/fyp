@@ -4,7 +4,7 @@ const getCategories = (req, res) => {
   db.query('SELECT * FROM categories', (err, results) => {
     if (err) {
       console.error('Error fetching categories:', err);
-      return res.status(500).json({message: 'Internal server error'});
+      return res.status(500).json({ message: 'Internal server error' });
     }
 
     res.json(results);
@@ -23,7 +23,7 @@ const getUserCategories = (req, res) => {
   db.query(sql, [userId], (err, results) => {
     if (err) {
       console.error('Error fetching user categories:', err);
-      return res.status(500).json({message: 'Internal server error'});
+      return res.status(500).json({ message: 'Internal server error' });
     }
     res.json(results);
   });
@@ -32,27 +32,27 @@ const getUserCategories = (req, res) => {
 // Add categories for a user
 const addUserCategories = (req, res) => {
   const userId = req.user.id;
-  const {categoryIds} = req.body;
+  const { categoryIds } = req.body;
 
   if (!userId || !Array.isArray(categoryIds)) {
-    return res.status(400).json({message: 'Invalid input'});
+    return res.status(400).json({ message: 'Invalid input' });
   }
 
-  const values = categoryIds.map(categoryId => [userId, categoryId]);
+  const values = categoryIds.map((categoryId) => [userId, categoryId]);
   const sql =
     'INSERT IGNORE INTO user_categories (user_id, category_id) VALUES ?';
 
   db.query(sql, [values], (err, results) => {
     if (err) {
       console.error('Error adding user categories:', err);
-      return res.status(500).json({message: 'Internal server error'});
+      return res.status(500).json({ message: 'Internal server error' });
     }
-    res.status(201).json({message: 'Categories added successfully'});
+    res.status(201).json({ message: 'Categories added successfully' });
   });
 };
 
 const getMaterials = (req, res) => {
-  const {categories} = req.query;
+  const { categories } = req.query;
 
   // console.log('🛠️ getMaterials controller called');
   // console.log('📥 Received categories query:', categories);
@@ -68,8 +68,8 @@ const getMaterials = (req, res) => {
   if (categories) {
     const ids = categories
       .split(',')
-      .map(id => parseInt(id))
-      .filter(id => !isNaN(id));
+      .map((id) => parseInt(id))
+      .filter((id) => !isNaN(id));
 
     // console.log('🔍 Parsed category IDs:', ids);
 
@@ -78,9 +78,10 @@ const getMaterials = (req, res) => {
       sql += ` WHERE m.category_id IN (${placeholders})`;
       params = ids;
     }
-  } else {
-    console.log('📂 No categories specified, returning all');
   }
+  // else {
+  //   console.log('📂 No categories specified, returning all');
+  // }
 
   // console.log('🧾 Final SQL:', sql);
   // console.log('📌 Params:', params);
@@ -88,10 +89,10 @@ const getMaterials = (req, res) => {
   db.query(sql, params, (err, results) => {
     if (err) {
       console.error('❌ DB query error:', err);
-      return res.status(500).json({message: 'Database error'});
+      return res.status(500).json({ message: 'Database error' });
     }
 
-    console.log(`✅ Returning ${results.length} materials`);
+    // console.log(`✅ Returning ${results.length} materials`);
     res.json(results);
   });
 };
@@ -101,7 +102,7 @@ const deleteUserCategory = (req, res) => {
   const categoryId = parseInt(req.params.categoryId);
 
   if (!userId || !categoryId) {
-    return res.status(400).json({message: 'Invalid request'});
+    return res.status(400).json({ message: 'Invalid request' });
   }
 
   const sql =
@@ -110,9 +111,9 @@ const deleteUserCategory = (req, res) => {
   db.query(sql, [userId, categoryId], (err, results) => {
     if (err) {
       console.error('Error deleting user category:', err);
-      return res.status(500).json({message: 'Internal server error'});
+      return res.status(500).json({ message: 'Internal server error' });
     }
-    res.status(200).json({message: 'Category removed successfully'});
+    res.status(200).json({ message: 'Category removed successfully' });
   });
 };
 

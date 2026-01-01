@@ -56,7 +56,10 @@ app.use(
 // app.use(cors());
 app.use(
   cors({
-    origin: 'http://localhost:3000', // Explicitly allow frontend URL
+    origin: [
+      'http://localhost:3000', // local React dev
+      'https://liwei1214.github.io/fyp', // GitHub Pages frontend
+    ],
     credentials: true, // Allow cookies/sessions
     allowedHeaders: ['Content-Type', 'Authorization'], // Allow necessary headers
   })

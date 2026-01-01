@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 // Set up Axios with credentials for authentication (JWT)
 const axiosInstance = axios.create({
@@ -13,7 +13,7 @@ const axiosInstance = axios.create({
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
-  return token ? {Authorization: `Bearer ${token}`} : {};
+  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 export const getNotes = async () => {
@@ -44,7 +44,7 @@ export const getRecentNotes = async () => {
   }
 };
 
-export const createNote = async noteData => {
+export const createNote = async (noteData) => {
   const response = await axiosInstance.post('/api/notes', noteData, {
     headers: getAuthHeaders(),
   });
@@ -58,7 +58,7 @@ export const updateNote = async (id, noteData) => {
   return response.data;
 };
 
-export const deleteNote = async id => {
+export const deleteNote = async (id) => {
   await axiosInstance.delete(`/api/notes/${id}`, {
     headers: getAuthHeaders(),
   });
@@ -79,7 +79,7 @@ export const getTodosWithType = async () => {
   return response.data;
 };
 
-export const createTodo = async todoData => {
+export const createTodo = async (todoData) => {
   const response = await axiosInstance.post('/api/todos', todoData, {
     headers: getAuthHeaders(),
   });
@@ -95,7 +95,7 @@ export const updateTodo = async (id, todoData) => {
 };
 
 // 🛠 FIX: Corrected deleteTodo to use URL instead of request body
-export const deleteTodo = async task_id => {
+export const deleteTodo = async (task_id) => {
   await axiosInstance.delete(`/api/todos/${task_id}`, {
     headers: getAuthHeaders(),
   });
@@ -109,21 +109,21 @@ export const getLists = async () => {
   return response.data;
 };
 
-export const createList = async name => {
+export const createList = async (name) => {
   const response = await axiosInstance.post(
     '/api/lists',
-    {name},
+    { name },
     {
       headers: {
         ...getAuthHeaders(),
         'Content-Type': 'application/json',
       },
-    },
+    }
   );
   return response.data;
 };
 
-export const deleteList = async id => {
+export const deleteList = async (id) => {
   await axiosInstance.delete(`/api/lists/${id}`, {
     headers: getAuthHeaders(), // Add authentication headers if needed
   });
@@ -132,13 +132,13 @@ export const deleteList = async id => {
 export const renameList = async (id, name) => {
   await axiosInstance.put(
     `/api/lists/${id}`,
-    {name},
+    { name },
     {
       headers: {
         ...getAuthHeaders(),
         'Content-Type': 'application/json',
       },
-    },
+    }
   );
 };
 
@@ -154,7 +154,7 @@ export const getCategories = async () => {
   }
 };
 
-export const uploadMaterial = async formData => {
+export const uploadMaterial = async (formData) => {
   try {
     const response = await axiosInstance.post(
       '/api/lecturer/materials',
@@ -164,7 +164,7 @@ export const uploadMaterial = async formData => {
           'Content-Type': 'multipart/form-data',
           ...getAuthHeaders(),
         },
-      },
+      }
     );
     return response.data;
   } catch (error) {
@@ -185,13 +185,13 @@ export const getUploadedMaterials = async () => {
   }
 };
 
-export const deleteMaterial = async materialId => {
+export const deleteMaterial = async (materialId) => {
   try {
     const response = await axiosInstance.delete(
       `/api/lecturer/materials/${materialId}`,
       {
         headers: getAuthHeaders(),
-      },
+      }
     );
     return response.data;
   } catch (error) {
@@ -210,7 +210,7 @@ export const updateMaterial = async (id, formData) => {
           'Content-Type': 'multipart/form-data',
           ...getAuthHeaders(),
         },
-      },
+      }
     );
     return response.data;
   } catch (error) {
@@ -219,7 +219,7 @@ export const updateMaterial = async (id, formData) => {
   }
 };
 
-export const getMaterialById = async id => {
+export const getMaterialById = async (id) => {
   try {
     const response = await axiosInstance.get(`/api/lecturer/materials/${id}`, {
       headers: getAuthHeaders(),
@@ -231,17 +231,17 @@ export const getMaterialById = async id => {
   }
 };
 
-export const getQuizQuestionsByMaterialId = async materialId => {
+export const getQuizQuestionsByMaterialId = async (materialId) => {
   try {
     const response = await axiosInstance.get(
       `/api/quizzes/by-material/${materialId}`,
-      {headers: getAuthHeaders()},
+      { headers: getAuthHeaders() }
     );
     return response.data;
   } catch (error) {
     console.error(
       `Error fetching quiz questions for category ID ${materialId}:`,
-      error,
+      error
     );
     throw error;
   }
@@ -270,26 +270,26 @@ export const getUserCategories = async () => {
   return res.data;
 };
 
-export const saveUserCategories = async categoryIds => {
+export const saveUserCategories = async (categoryIds) => {
   const res = await axiosInstance.post(
     '/api/user-categories',
-    {categoryIds},
-    {headers: getAuthHeaders()},
+    { categoryIds },
+    { headers: getAuthHeaders() }
   );
   return res.data;
 };
 
-export const deleteUserCategory = async categoryId => {
+export const deleteUserCategory = async (categoryId) => {
   const response = await axiosInstance.delete(
     `/api/user-categories/${categoryId}`,
-    {headers: getAuthHeaders()},
+    { headers: getAuthHeaders() }
   );
   return response.data;
 };
 
-export const getStudentQuizByMaterialId = async materialId => {
+export const getStudentQuizByMaterialId = async (materialId) => {
   const response = await axiosInstance.get(
-    `/api/quizzes/by-material/${materialId}`,
+    `/api/quizzes/by-material/${materialId}`
   );
   return response.data;
 };
