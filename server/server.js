@@ -18,6 +18,21 @@ const sharp = require('sharp');
 
 const app = express();
 
+app.use(
+  cors({
+    origin: [
+      'http://localhost:3000', // local React dev
+      'https://liwei1214.github.io/fyp', // GitHub Pages frontend
+    ],
+    credentials: true, // Allow cookies/sessions
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow necessary headers
+    exposedHeaders: ['Content-Length', 'Authorization'],
+  })
+);
+
+app.options('*', cors()); // This handles all OPTIONS requests
+
 app.get('/', (req, res) => {
   res.send('Backend is running ✅');
 });
@@ -50,18 +65,6 @@ app.use(
     secret: process.env.SESSION_KEY,
     resave: false,
     saveUninitialized: false,
-  })
-);
-
-// app.use(cors());
-app.use(
-  cors({
-    origin: [
-      'http://localhost:3000', // local React dev
-      'https://liwei1214.github.io/fyp', // GitHub Pages frontend
-    ],
-    credentials: true, // Allow cookies/sessions
-    allowedHeaders: ['Content-Type', 'Authorization'], // Allow necessary headers
   })
 );
 
