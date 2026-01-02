@@ -1,33 +1,33 @@
-import React, {useState, useContext} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import {UserContext} from '../context/UserContext';
+import { UserContext } from '../context/UserContext';
 
 const Login = () => {
-  const [credentials, setCredentials] = useState({email: '', password: ''});
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const {setUser} = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
 
   const navigate = useNavigate();
 
-  const handleChange = e => {
-    setCredentials({...credentials, [e.target.name]: e.target.value});
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(prevState => !prevState);
+    setShowPassword((prevState) => !prevState);
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
       const res = await axios.post(
         'http://localhost:5000/api/login',
-        credentials,
+        credentials
       );
-      const {token, role} = res.data;
+      const { token, role } = res.data;
 
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
@@ -48,7 +48,7 @@ const Login = () => {
       }
     } catch (error) {
       alert(
-        'Login failed: ' + (error.response?.data.error || 'Server unreachable'),
+        'Login failed: ' + (error.response?.data.error || 'Server unreachable')
       );
     } finally {
       setIsSubmitting(false);
@@ -83,7 +83,8 @@ const Login = () => {
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+              >
                 {showPassword ? '🙈' : '👁️'}
               </button>
             </div>
@@ -95,15 +96,16 @@ const Login = () => {
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-blue-500 hover:bg-blue-600'
             }`}
-            disabled={isSubmitting}>
+            disabled={isSubmitting}
+          >
             {isSubmitting ? 'Logging in...' : 'Login'}
           </button>
         </form>
         <p className="text-sm text-gray-600 mt-4">
           Don't have an account?{' '}
-          <a href="/register" className="text-blue-500 hover:underline">
+          <Link to="/register" className="text-blue-500 hover:underline">
             Register here
-          </a>
+          </Link>
         </p>
       </div>
     </div>

@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Register = () => {
@@ -13,11 +13,11 @@ const Register = () => {
 
   const navigate = useNavigate();
 
-  const handleChange = e => {
-    setFormData({...formData, [e.target.name]: e.target.value});
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -34,7 +34,7 @@ const Register = () => {
     try {
       const res = await axios.post(
         'http://localhost:5000/api/register',
-        formData,
+        formData
       );
       alert(res.data.message);
       navigate('/login');
@@ -96,7 +96,8 @@ const Register = () => {
               name="role"
               onChange={handleChange}
               className="w-full p-3 text-black border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required>
+              required
+            >
               <option value="">-- Select --</option>
               <option value="student">Student</option>
               <option value="lecturer">Lecturer</option>
@@ -104,15 +105,16 @@ const Register = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-lg transition duration-300">
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-lg transition duration-300"
+          >
             Register
           </button>
         </form>
         <p className="text-center text-gray-600 mt-4">
           Already have an account?{' '}
-          <a href="/login" className="text-blue-600 hover:underline">
+          <Link to="/login" className="text-blue-600 hover:underline">
             Login here
-          </a>
+          </Link>
         </p>
       </div>
     </div>
