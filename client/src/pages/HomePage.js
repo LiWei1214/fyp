@@ -1,5 +1,5 @@
-import React, {useEffect, useContext} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useEffect, useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   FaEdit,
   FaImage,
@@ -8,7 +8,7 @@ import {
   FaChartLine,
   FaShareAlt,
 } from 'react-icons/fa';
-import {UserContext} from '../context/UserContext';
+import { UserContext } from '../context/UserContext';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -47,7 +47,7 @@ const features = [
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const {user} = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -78,13 +78,14 @@ export default function HomePage() {
           <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto animate-fade-in-up delay-150">
             Capture. Organize. Grow. — Your intelligent note space
           </p>
-          <a
-            href="/register"
+          <Link
+            to="/register"
             className="inline-block bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-10 py-4 rounded-full text-lg font-semibold shadow-lg hover:shadow-2xl transform hover:scale-105 transition"
             data-aos="fade-up"
-            data-aos-delay="100">
+            data-aos-delay="100"
+          >
             Start Taking Notes →
-          </a>
+          </Link>
         </div>
 
         {/* Decorative Blobs */}
@@ -103,7 +104,8 @@ export default function HomePage() {
               key={i}
               className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-300 border dark:border-gray-700"
               data-aos="fade-up"
-              data-aos-delay={i * 100}>
+              data-aos-delay={i * 100}
+            >
               <div className="text-4xl text-blue-600 dark:text-blue-400 mb-4">
                 {f.icon}
               </div>
