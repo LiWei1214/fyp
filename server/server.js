@@ -23,6 +23,7 @@ app.use(
     origin: [
       'http://localhost:3000', // local React dev
       'https://liwei1214.github.io/fyp', // GitHub Pages frontend
+      'https://liwei1214.github.io', // GitHub Pages frontend without fyp
     ],
     credentials: true, // Allow cookies/sessions
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
