@@ -75,6 +75,56 @@ const register = async (req, res) => {
 };
 
 // Login API
+// const login = async (req, res) => {
+//   const { email, password } = req.body;
+
+//   if (!email || !password) {
+//     return res.status(400).json({ error: 'Email and password are required' });
+//   }
+
+//   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//   if (!emailRegex.test(email)) {
+//     return res.status(400).json({ error: 'Invalid email format' });
+//   }
+
+//   const query = 'SELECT * FROM users WHERE email = ?';
+
+//   db.query(query, [email], async (err, results) => {
+//     if (err) return res.status(500).json({ error: 'Database error' });
+
+//     if (results.length === 0) {
+//       return res.status(401).json({ error: 'User not found' });
+//     }
+
+//     const user = results[0];
+
+//     const passwordMatch = await bcrypt.compare(password, user.password);
+//     if (!passwordMatch) {
+//       return res.status(401).json({ error: 'Incorrect password' });
+//     }
+
+//     const token = jwt.sign(
+//       { id: user.id, role: user.role },
+//       process.env.JWT_SECRET,
+//       { expiresIn: '90d' }
+//     );
+
+//     let redirectUrl = '/unauthorized';
+//     if (user.role === 'student') {
+//       redirectUrl = '/dashboard/student';
+//     } else if (user.role === 'lecturer') {
+//       redirectUrl = '/dashboard/lecturer';
+//     }
+
+//     res.json({
+//       message: 'Login successful',
+//       token,
+//       role: user.role,
+//       redirect: redirectUrl, // Send redirection URL
+//     });
+//   });
+// };
+
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -87,16 +137,17 @@ const login = async (req, res) => {
     return res.status(400).json({ error: 'Invalid email format' });
   }
 
-  const query = 'SELECT * FROM users WHERE email = ?';
+  try {
+    // PostgreSQL uses $1 placeholders
+    const result = await db.query('SELECT * FROM users WHERE email = $1', [
+      email,
+    ]);
 
-  db.query(query, [email], async (err, results) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
-
-    if (results.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(401).json({ error: 'User not found' });
     }
 
-    const user = results[0];
+    const user = result.rows[0];
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
@@ -120,9 +171,12 @@ const login = async (req, res) => {
       message: 'Login successful',
       token,
       role: user.role,
-      redirect: redirectUrl, // Send redirection URL
+      redirect: redirectUrl,
     });
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
 };
 
 // const logout = async (req, res) => {
