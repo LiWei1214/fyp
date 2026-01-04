@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { UserContext } from '../context/UserContext';
+import API_URL from '../services/apiService';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -23,16 +24,13 @@ const Login = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await axios.post(
-        'http://localhost:5000/api/login',
-        credentials
-      );
+      const res = await axios.post(`${API_URL}/api/login`, credentials);
       const { token, role } = res.data;
 
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
 
-      const profileRes = await axios.get('http://localhost:5000/api/profile', {
+      const profileRes = await axios.get(`${API_URL}/api/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
