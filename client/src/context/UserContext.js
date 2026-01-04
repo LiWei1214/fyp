@@ -19,7 +19,6 @@ const UserProvider = ({ children }) => {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          credentials: 'include', // Ensure cookies and session data are sent
         });
 
         if (!response.ok) throw new Error('Failed to fetch profile');
