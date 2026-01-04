@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../context/ThemeContext'; // Import theme context
+import API_URL from '../services/apiService';
 
 const Profile = () => {
   const { theme } = useContext(ThemeContext); // Get the theme state

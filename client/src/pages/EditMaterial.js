@@ -7,6 +7,7 @@ import {
   getQuizQuestionsByMaterialId,
 } from '../services/apiService'; // Need a new API function
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import API_URL from '../services/apiService';
 
 const EditMaterial = () => {
   const { id } = useParams();

@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
+import API_URL from '../services/apiService';
 
 export const UserContext = createContext();
 
