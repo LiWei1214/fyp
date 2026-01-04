@@ -28,7 +28,13 @@ export const getNotes = async () => {
     console.log('API Response (getNotes):', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching notes:', error);
+    // console.error('Error fetching notes:', error);
+    if (error.response) {
+      console.error('Status:', error.response.status);
+      console.error('Data:', error.response.data);
+    } else {
+      console.error('Network error:', error.message);
+    }
     return [];
   }
 };
