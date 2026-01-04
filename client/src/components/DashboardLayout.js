@@ -1,30 +1,34 @@
-import {useContext, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {UserContext} from '../context/UserContext';
-import {ThemeContext} from '../context/ThemeContext';
-import {FaHome, FaTasks, FaCog, FaUserCircle} from 'react-icons/fa';
-import {GrResources} from 'react-icons/gr';
-import {PiNotebookFill} from 'react-icons/pi';
-import {FiSearch, FiMoon, FiSun, FiSettings} from 'react-icons/fi';
+import { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/UserContext';
+import { ThemeContext } from '../context/ThemeContext';
+import { FaHome, FaTasks, FaCog, FaUserCircle } from 'react-icons/fa';
+import { GrResources } from 'react-icons/gr';
+import { PiNotebookFill } from 'react-icons/pi';
+import { FiSearch, FiMoon, FiSun, FiSettings } from 'react-icons/fi';
 import NottieLogo from '../assets/NottieLogo.png';
 import Logo from '../assets/Logo.png';
-import {SearchContext} from '../context/SearchContext';
+import { SearchContext } from '../context/SearchContext';
 
-const DashboardLayout = ({children}) => {
-  const {user} = useContext(UserContext);
-  const {theme, toggleTheme} = useContext(ThemeContext);
+const DashboardLayout = ({ children }) => {
+  const { user } = useContext(UserContext);
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const {searchQuery, setSearchQuery} = useContext(SearchContext);
+  const { searchQuery, setSearchQuery } = useContext(SearchContext);
 
   const isDark = theme === 'dark';
 
   const handleLogout = async () => {
     if (!window.confirm('Are you sure you want to log out?')) return;
     try {
-      const response = await fetch('http://localhost:5000/api/logout', {
+      const response = await fetch(`${API_URL}/api/logout`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         credentials: 'include',
       });
       if (!response.ok) throw new Error('Logout failed');
@@ -41,7 +45,8 @@ const DashboardLayout = ({children}) => {
     <div
       className={`grid grid-cols-[auto_1fr] h-screen ${
         isDark ? 'bg-[#181818] text-[#EAEAEA]' : 'bg-[#F5F5F5] text-black'
-      }`}>
+      }`}
+    >
       {/* Sidebar */}
       <div
         className={`h-full ${
@@ -50,10 +55,12 @@ const DashboardLayout = ({children}) => {
             : 'bg-gradient-to-b from-gray-100 to-gray-200'
         } shadow-xl flex flex-col transition-all duration-300 ease-in-out ${
           sidebarOpen ? 'w-64' : 'w-20'
-        } overflow-hidden rounded-tr-3xl rounded-br-3xl`}>
+        } overflow-hidden rounded-tr-3xl rounded-br-3xl`}
+      >
         <button
           className="h-20 flex items-center justify-center"
-          onClick={() => setSidebarOpen(!sidebarOpen)}>
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
           <img
             src={sidebarOpen ? NottieLogo : Logo}
             alt="Nottie Logo"
@@ -67,15 +74,15 @@ const DashboardLayout = ({children}) => {
 
         <nav className="flex flex-col gap-2 mt-6">
           {[
-            {label: 'Home', icon: <FaHome />, path: '/home'},
-            {label: 'Notes', icon: <PiNotebookFill />, path: '/note'},
-            {label: 'To-Do List', icon: <FaTasks />, path: '/todos'},
+            { label: 'Home', icon: <FaHome />, path: '/home' },
+            { label: 'Notes', icon: <PiNotebookFill />, path: '/note' },
+            { label: 'To-Do List', icon: <FaTasks />, path: '/todos' },
             {
               label: 'Online Resources',
               icon: <GrResources />,
               path: '/online-resources',
             },
-          ].map(({label, icon, path}) => (
+          ].map(({ label, icon, path }) => (
             <button
               key={label}
               onClick={() => navigate(path)}
@@ -91,7 +98,8 @@ const DashboardLayout = ({children}) => {
                     ? 'bg-[#333333] text-white'
                     : 'bg-white shadow-md text-black'
                   : ''
-              }`}>
+              }`}
+            >
               <span className="text-[22px]">{icon}</span>
               {sidebarOpen && <span>{label}</span>}
             </button>
@@ -105,14 +113,15 @@ const DashboardLayout = ({children}) => {
         <header
           className={`flex items-center justify-between p-4 shadow-md ${
             isDark ? 'bg-[#242424]' : 'bg-white'
-          }`}>
+          }`}
+        >
           {/* Search */}
           <div className="flex items-center gap-2 w-96">
             <FiSearch className="text-gray-500" />
             <input
               type="text"
               placeholder="Search..."
-              onChange={e => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className={`w-full p-2 border-2 rounded-md outline-none bg-transparent ${
                 isDark
                   ? 'text-[#EAEAEA] border-[#333]'
@@ -132,7 +141,8 @@ const DashboardLayout = ({children}) => {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className={`w-10 h-10 flex items-center justify-center rounded-full ${
                   isDark ? 'bg-[#333] text-white' : 'bg-gray-300 text-gray-700'
-                }`}>
+                }`}
+              >
                 {user ? (
                   user.username.charAt(0).toUpperCase()
                 ) : (
@@ -146,7 +156,8 @@ const DashboardLayout = ({children}) => {
                     isDark
                       ? 'bg-[#333] text-[#EAEAEA] border-[#444]'
                       : 'bg-white text-black border-gray-200'
-                  }`}>
+                  }`}
+                >
                   <button
                     className={`block w-full px-4 py-2 text-left transition ${
                       isDark ? 'hover:bg-[#444]' : 'hover:bg-gray-100'
@@ -154,7 +165,8 @@ const DashboardLayout = ({children}) => {
                     onClick={() => {
                       setDropdownOpen(false);
                       navigate('/profile');
-                    }}>
+                    }}
+                  >
                     Edit Profile
                   </button>
                   <button
@@ -163,7 +175,8 @@ const DashboardLayout = ({children}) => {
                         ? 'hover:bg-[#444] hover:text-red-400'
                         : 'hover:bg-red-100'
                     }`}
-                    onClick={handleLogout}>
+                    onClick={handleLogout}
+                  >
                     Logout
                   </button>
                 </div>
