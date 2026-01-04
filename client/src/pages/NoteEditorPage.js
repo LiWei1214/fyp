@@ -12,6 +12,8 @@ const NoteEditorPage = () => {
   const timeoutRef = useRef(null);
   const [saveMessage, setSaveMessage] = useState('');
   const messageTimeoutRef = useRef(null);
+  const isCreatingRef = useRef(false);
+  const noteIdRef = useRef(null);
 
   useEffect(() => {
     const initializeNote = async () => {
@@ -22,6 +24,7 @@ const NoteEditorPage = () => {
             (n) => Number(n.id) === Number(paramId)
           );
           if (existingNote) setNote(existingNote);
+          noteIdRef.current = existingNote.id;
         } catch (error) {
           console.error('Error fetching note:', error);
         }
@@ -29,6 +32,7 @@ const NoteEditorPage = () => {
         const extractedText = location.state?.extractedText || '';
         const extractedTitle = location.state?.extractedTitle || '';
         setNote({ id: null, title: extractedTitle, content: extractedText });
+        noteIdRef.current = null;
       }
     };
     initializeNote();
@@ -73,47 +77,46 @@ const NoteEditorPage = () => {
   // };
 
   const handleAutoSave = (updatedContent) => {
-    setIsSaving(true);
     clearTimeout(timeoutRef.current);
 
     timeoutRef.current = setTimeout(async () => {
+      if (!note.title.trim() || !updatedContent.trim()) return;
+
+      if (!noteIdRef.current && isCreatingRef.current) return;
+
       try {
-        if (!note.title.trim() || !updatedContent.trim()) {
-          setIsSaving(false);
-          setSaveMessage('Title and content required ✗');
-          clearTimeout(messageTimeoutRef.current);
-          messageTimeoutRef.current = setTimeout(
-            () => setSaveMessage(''),
-            3000
-          );
-          return;
-        }
+        setIsSaving(true);
 
-        let response;
-        if (!note.id) {
-          // First save -> create note
-          response = await createNote({
+        if (!noteIdRef.current) {
+          isCreatingRef.current = true;
+
+          const response = await createNote({
             title: note.title,
             content: updatedContent,
           });
-          // Update note state with returned ID so future saves will UPDATE instead of CREATE
-          setNote((prev) => ({ ...prev, id: response.noteId }));
+
+          noteIdRef.current = response.noteId;
+
+          setNote((prev) => ({
+            ...prev,
+            id: response.noteId,
+          }));
+
+          isCreatingRef.current = false;
         } else {
-          // Existing note -> update
-          response = await updateNote(note.id, {
+          await updateNote(noteIdRef.current, {
             title: note.title,
             content: updatedContent,
           });
         }
 
-        setIsSaving(false);
         setSaveMessage('Saved ✓');
-        clearTimeout(messageTimeoutRef.current);
-        messageTimeoutRef.current = setTimeout(() => setSaveMessage(''), 3000);
       } catch (error) {
         console.error('Error saving note:', error);
-        setIsSaving(false);
         setSaveMessage('Failed ✗');
+        isCreatingRef.current = false;
+      } finally {
+        setIsSaving(false);
         clearTimeout(messageTimeoutRef.current);
         messageTimeoutRef.current = setTimeout(() => setSaveMessage(''), 3000);
       }
