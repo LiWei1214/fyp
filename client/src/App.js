@@ -23,7 +23,7 @@ function App() {
     <SearchProvider>
       <ThemeProvider>
         <UserProvider>
-          <Router basename="/fyp">
+          <Router>
             <Routes>
               <Route
                 element={

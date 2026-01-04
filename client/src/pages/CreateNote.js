@@ -1,22 +1,22 @@
-import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CreateNote = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/api/notes', {
+      const response = await fetch(`${API_URL}/api/notes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({title, content}),
+        body: JSON.stringify({ title, content }),
       });
 
       if (response.ok) {
@@ -39,20 +39,22 @@ const CreateNote = () => {
           type="text"
           placeholder="Title"
           value={title}
-          onChange={e => setTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           required
           className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
         />
         <textarea
           placeholder="Write your note here..."
           value={content}
-          onChange={e => setContent(e.target.value)}
+          onChange={(e) => setContent(e.target.value)}
           required
           rows="6"
-          className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"></textarea>
+          className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+        ></textarea>
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition">
+          className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition"
+        >
           Save Note
         </button>
       </form>

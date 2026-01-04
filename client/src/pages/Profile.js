@@ -1,10 +1,10 @@
-import React, {useContext, useState, useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {ThemeContext} from '../context/ThemeContext'; // Import theme context
+import React, { useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ThemeContext } from '../context/ThemeContext'; // Import theme context
 
 const Profile = () => {
-  const {theme} = useContext(ThemeContext); // Get the theme state
-  const [user, setUser] = useState({username: '', email: ''});
+  const { theme } = useContext(ThemeContext); // Get the theme state
+  const [user, setUser] = useState({ username: '', email: '' });
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -24,7 +24,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/profile', {
+        const response = await fetch(`${API_URL}/api/profile`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -46,22 +46,22 @@ const Profile = () => {
   }, []);
 
   // Handle form input changes
-  const handleChange = e => {
-    setUser({...user, [e.target.name]: e.target.value});
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const handlePasswordChange = e => {
-    setPasswordData({...passwordData, [e.target.name]: e.target.value});
+  const handlePasswordChange = (e) => {
+    setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
   };
 
-  const togglePasswordVisibility = field => {
-    setShowPassword(prev => ({...prev, [field]: !prev[field]}));
+  const togglePasswordVisibility = (field) => {
+    setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
   // Handle profile update
   const handleUpdate = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/profile', {
+      const response = await fetch(`${API_URL}/api/profile`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -82,7 +82,7 @@ const Profile = () => {
   };
 
   const handlePasswordUpdate = async () => {
-    const {currentPassword, newPassword, confirmPassword} = passwordData;
+    const { currentPassword, newPassword, confirmPassword } = passwordData;
 
     if (!currentPassword || !newPassword || !confirmPassword) {
       alert('Please fill in all password fields');
@@ -95,18 +95,15 @@ const Profile = () => {
     }
 
     try {
-      const response = await fetch(
-        'http://localhost:5000/api/profile/password',
-        {
-          method: 'PUT',
-          credentials: 'include',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(passwordData),
+      const response = await fetch(`${API_URL}/api/profile/password`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify(passwordData),
+      });
 
       if (!response.ok) throw new Error('Password update failed');
 
@@ -127,7 +124,8 @@ const Profile = () => {
     <div
       className={`max-w-2xl mx-auto p-6 mt-10 rounded-2xl shadow-lg ${
         theme === 'dark' ? 'bg-[#242424] text-[#EAEAEA]' : 'bg-white text-black'
-      }`}>
+      }`}
+    >
       <h2 className="text-3xl font-bold text-center mb-6">User Profile</h2>
 
       {/* Profile Details */}
@@ -140,7 +138,8 @@ const Profile = () => {
           <label
             className={`block mb-1 font-medium ${
               theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-            }`}>
+            }`}
+          >
             Username
           </label>
           <input
@@ -161,7 +160,8 @@ const Profile = () => {
           <label
             className={`block mb-1 font-medium ${
               theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-            }`}>
+            }`}
+          >
             Email
           </label>
           <input
@@ -181,13 +181,15 @@ const Profile = () => {
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition">
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
+          >
             Edit Profile
           </button>
         ) : (
           <button
             onClick={handleUpdate}
-            className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
+            className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition"
+          >
             Save Changes
           </button>
         )}
@@ -199,7 +201,8 @@ const Profile = () => {
           <label
             className={`block mb-1 font-medium ${
               theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-            }`}>
+            }`}
+          >
             Current Password
           </label>
           <div className="relative">
@@ -218,7 +221,8 @@ const Profile = () => {
             <button
               type="button"
               onClick={() => togglePasswordVisibility('current')}
-              className="absolute inset-y-0 right-3 flex items-center text-sm text-gray-500 hover:text-gray-700">
+              className="absolute inset-y-0 right-3 flex items-center text-sm text-gray-500 hover:text-gray-700"
+            >
               {showPassword.current ? '🙈' : '👁️'}
             </button>
           </div>
@@ -228,7 +232,8 @@ const Profile = () => {
           <label
             className={`block mb-1 font-medium ${
               theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-            }`}>
+            }`}
+          >
             New Password
           </label>
           <div className="relative">
@@ -247,7 +252,8 @@ const Profile = () => {
             <button
               type="button"
               onClick={() => togglePasswordVisibility('new')}
-              className="absolute inset-y-0 right-3 flex items-center text-sm text-gray-500 hover:text-gray-700">
+              className="absolute inset-y-0 right-3 flex items-center text-sm text-gray-500 hover:text-gray-700"
+            >
               {showPassword.new ? '🙈' : '👁️'}
             </button>
           </div>
@@ -257,7 +263,8 @@ const Profile = () => {
           <label
             className={`block mb-1 font-medium ${
               theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-            }`}>
+            }`}
+          >
             Confirm New Password
           </label>
           <div className="relative">
@@ -276,7 +283,8 @@ const Profile = () => {
             <button
               type="button"
               onClick={() => togglePasswordVisibility('confirm')}
-              className="absolute inset-y-0 right-3 flex items-center text-sm text-gray-500 hover:text-gray-700">
+              className="absolute inset-y-0 right-3 flex items-center text-sm text-gray-500 hover:text-gray-700"
+            >
               {showPassword.confirm ? '🙈' : '👁️'}
             </button>
           </div>
@@ -284,14 +292,16 @@ const Profile = () => {
 
         <button
           onClick={handlePasswordUpdate}
-          className="w-full bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition">
+          className="w-full bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition"
+        >
           Update Password
         </button>
       </div>
 
       <button
         onClick={() => navigate('/home')}
-        className="w-full mt-6 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
+        className="w-full mt-6 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+      >
         Back to Dashboard
       </button>
     </div>

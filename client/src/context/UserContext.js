@@ -1,8 +1,8 @@
-import {createContext, useState, useEffect} from 'react';
+import { createContext, useState, useEffect } from 'react';
 
 export const UserContext = createContext();
 
-const UserProvider = ({children}) => {
+const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const token = localStorage.getItem('token');
 
@@ -12,7 +12,7 @@ const UserProvider = ({children}) => {
       if (!token) return;
 
       try {
-        const response = await fetch('http://localhost:5000/api/profile', {
+        const response = await fetch(`${API_URL}/api/profile`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -34,7 +34,7 @@ const UserProvider = ({children}) => {
   }, [token]); // Run when token changes
 
   return (
-    <UserContext.Provider value={{user, setUser}}>
+    <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>
   );

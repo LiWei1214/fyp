@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import LecturerDashboardLayout from '../components/LecturerDashboardLayout';
 import {
   getCategories,
@@ -6,10 +6,10 @@ import {
   getMaterialById,
   getQuizQuestionsByMaterialId,
 } from '../services/apiService'; // Need a new API function
-import {useParams, useNavigate, Link} from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 const EditMaterial = () => {
-  const {id} = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [material, setMaterial] = useState(null);
   const [title, setTitle] = useState('');
@@ -38,7 +38,7 @@ const EditMaterial = () => {
         if (existingQuizQuestions && existingQuizQuestions.length > 0) {
           setIsQuizEnabled(true);
           setQuizQuestions(
-            existingQuizQuestions.map(q => ({
+            existingQuizQuestions.map((q) => ({
               id: q.id,
               question_text: q.question_text,
               options:
@@ -47,7 +47,7 @@ const EditMaterial = () => {
                   : q.options,
               correct_answer: q.correct_answer,
               _status: 'existing',
-            })),
+            }))
           );
         } else {
           setQuizQuestions([
@@ -83,18 +83,18 @@ const EditMaterial = () => {
     ]);
   };
 
-  const handleRemoveQuestion = index => {
+  const handleRemoveQuestion = (index) => {
     const newQuestions = [...quizQuestions];
     if (newQuestions[index]._status === 'existing') {
       newQuestions[index]._status = 'deleted';
     } else {
       newQuestions.splice(index, 1);
     }
-    setQuizQuestions(newQuestions.filter(q => q._status !== 'deleted'));
+    setQuizQuestions(newQuestions.filter((q) => q._status !== 'deleted'));
   };
 
   const handleQuestionChange = (index, event) => {
-    const {name, value} = event.target;
+    const { name, value } = event.target;
     const newQuestions = [...quizQuestions];
     newQuestions[index][name] = value;
     if (newQuestions[index]._status === 'existing') {
@@ -104,7 +104,7 @@ const EditMaterial = () => {
   };
 
   const handleOptionChange = (questionIndex, optionIndex, event) => {
-    const {value} = event.target;
+    const { value } = event.target;
     const newQuestions = [...quizQuestions];
     newQuestions[questionIndex].options[optionIndex] = value;
     if (newQuestions[questionIndex]._status === 'existing') {
@@ -114,7 +114,7 @@ const EditMaterial = () => {
   };
 
   const handleCorrectAnswerChange = (index, event) => {
-    const {value} = event.target;
+    const { value } = event.target;
     const newQuestions = [...quizQuestions];
     newQuestions[index].correct_answer = value;
     if (newQuestions[index]._status === 'existing') {
@@ -123,7 +123,7 @@ const EditMaterial = () => {
     setQuizQuestions(newQuestions);
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append('title', title);
@@ -133,7 +133,9 @@ const EditMaterial = () => {
       formData.append('file', file);
     }
     formData.append('isQuizEnabled', isQuizEnabled);
-    const questionsToSend = quizQuestions.filter(q => q._status !== 'deleted');
+    const questionsToSend = quizQuestions.filter(
+      (q) => q._status !== 'deleted'
+    );
     console.log('Quiz questions being sent:', JSON.stringify(questionsToSend));
     formData.append('quizQuestions', JSON.stringify(questionsToSend));
 
@@ -148,7 +150,7 @@ const EditMaterial = () => {
     }
   };
 
-  const handleFileChange = e => {
+  const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
@@ -180,7 +182,7 @@ const EditMaterial = () => {
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Material title"
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
               required
             />
           </div>
@@ -193,7 +195,7 @@ const EditMaterial = () => {
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Brief description (optional)"
               value={desc}
-              onChange={e => setDesc(e.target.value)}
+              onChange={(e) => setDesc(e.target.value)}
               rows="4"
             />
           </div>
@@ -204,11 +206,12 @@ const EditMaterial = () => {
             </label>
             <select
               value={selectedCategory}
-              onChange={e => setSelectedCategory(e.target.value)}
+              onChange={(e) => setSelectedCategory(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
               <option value="">Select a category</option>
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
@@ -230,10 +233,11 @@ const EditMaterial = () => {
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 Current File:{' '}
                 <a
-                  href={`http://localhost:5000${material.file_path}`}
+                  href={`${API_URL}${material.file_path}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline">
+                  className="text-blue-500 hover:underline"
+                >
                   {material.file_path.split('/').pop()}
                 </a>
                 (Uploading a new file will replace the current one)
@@ -247,7 +251,7 @@ const EditMaterial = () => {
                 type="checkbox"
                 className="form-checkbox h-5 w-5 text-blue-600"
                 checked={isQuizEnabled}
-                onChange={e => setIsQuizEnabled(e.target.checked)}
+                onChange={(e) => setIsQuizEnabled(e.target.checked)}
               />
               <span className="ml-2 text-gray-700 dark:text-gray-300">
                 Enable Quiz
@@ -277,7 +281,7 @@ const EditMaterial = () => {
                     <textarea
                       name="question_text"
                       value={question.question_text}
-                      onChange={e => handleQuestionChange(index, e)}
+                      onChange={(e) => handleQuestionChange(index, e)}
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
@@ -291,7 +295,7 @@ const EditMaterial = () => {
                         <input
                           type="text"
                           value={option}
-                          onChange={e =>
+                          onChange={(e) =>
                             handleOptionChange(index, optionIndex, e)
                           }
                           className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -306,14 +310,16 @@ const EditMaterial = () => {
                     </label>
                     <select
                       value={question.correct_answer}
-                      onChange={e => handleCorrectAnswerChange(index, e)}
+                      onChange={(e) => handleCorrectAnswerChange(index, e)}
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      required>
+                      required
+                    >
                       <option value="">Select</option>
                       {question.options.map((_, optionIndex) => (
                         <option
                           key={String.fromCharCode(65 + optionIndex)}
-                          value={String.fromCharCode(65 + optionIndex)}>
+                          value={String.fromCharCode(65 + optionIndex)}
+                        >
                           {String.fromCharCode(65 + optionIndex)}
                         </option>
                       ))}
@@ -322,7 +328,8 @@ const EditMaterial = () => {
                   <button
                     type="button"
                     onClick={() => handleRemoveQuestion(index)}
-                    className="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    className="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  >
                     {question._status === 'existing'
                       ? 'Remove Question'
                       : 'Delete Question'}
@@ -332,7 +339,8 @@ const EditMaterial = () => {
               <button
                 type="button"
                 onClick={handleAddQuestion}
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              >
                 Add Question
               </button>
             </div>
@@ -341,12 +349,14 @@ const EditMaterial = () => {
           <div className="text-right space-x-4">
             <Link
               to="/lecturer-dashboard"
-              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-xl transition">
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-xl transition"
+            >
               Cancel
             </Link>
             <button
               type="submit"
-              className="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition font-semibold">
+              className="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition font-semibold"
+            >
               Update Material
             </button>
           </div>
