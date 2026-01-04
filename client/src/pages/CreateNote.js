@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../services/apiService';
 
 const CreateNote = () => {
   const [title, setTitle] = useState('');
