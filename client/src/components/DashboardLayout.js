@@ -24,15 +24,15 @@ const DashboardLayout = ({ children }) => {
   const handleLogout = async () => {
     if (!window.confirm('Are you sure you want to log out?')) return;
     try {
-      const response = await fetch(`${API_URL}/api/logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error('Logout failed');
+      // const response = await fetch(`${API_URL}/api/logout`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      //   credentials: 'include',
+      // });
+      // if (!response.ok) throw new Error('Logout failed');
       localStorage.clear();
       sessionStorage.clear();
       navigate('/login');
