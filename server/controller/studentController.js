@@ -159,35 +159,69 @@ exports.getTodos = async (req, res) => {
   }
 };
 
-exports.getTodosWithType = (req, res) => {
-  const studentId = req.user.id;
-  const sql =
-    'SELECT id, title, is_completed, due_date FROM todos WHERE student_id = ?';
-  db.query(sql, [studentId], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
+// exports.getTodosWithType = (req, res) => {
+//   const studentId = req.user.id;
+//   const sql =
+//     'SELECT id, title, is_completed, due_date FROM todos WHERE student_id = ?';
+//   db.query(sql, [studentId], (err, results) => {
+//     if (err) return res.status(500).json({ error: 'Database error' });
 
-    const todos = results.map((todo) => {
+//     const todos = results.map((todo) => {
+//       const dueDate = new Date(todo.due_date);
+//       const dueYear = dueDate.getFullYear();
+//       const dueMonth = dueDate.getMonth();
+//       const dueDay = dueDate.getDate();
+
+//       const todayDate = new Date();
+//       const todayYear = todayDate.getFullYear();
+//       const todayMonth = todayDate.getMonth();
+//       const todayDay = todayDate.getDate();
+
+//       const thisMonthYear = todayDate.getFullYear();
+//       const thisMonthMonth = todayDate.getMonth();
+
+//       let type = 'other';
+//       if (
+//         dueYear === todayYear &&
+//         dueMonth === todayMonth &&
+//         dueDay === todayDay
+//       ) {
+//         type = 'daily';
+//       } else if (dueYear === thisMonthYear && dueMonth === thisMonthMonth) {
+//         type = 'monthly';
+//       }
+
+//       return { ...todo, type };
+//     });
+
+//     res.json(todos);
+//   });
+// };
+exports.getTodosWithType = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+
+    const { rows } = await db.query(
+      'SELECT id, title, is_completed, due_date FROM todos WHERE student_id = $1',
+      [studentId]
+    );
+
+    // Map todos and calculate type
+    const todos = rows.map((todo) => {
       const dueDate = new Date(todo.due_date);
-      const dueYear = dueDate.getFullYear();
-      const dueMonth = dueDate.getMonth();
-      const dueDay = dueDate.getDate();
-
-      const todayDate = new Date();
-      const todayYear = todayDate.getFullYear();
-      const todayMonth = todayDate.getMonth();
-      const todayDay = todayDate.getDate();
-
-      const thisMonthYear = todayDate.getFullYear();
-      const thisMonthMonth = todayDate.getMonth();
+      const today = new Date();
 
       let type = 'other';
       if (
-        dueYear === todayYear &&
-        dueMonth === todayMonth &&
-        dueDay === todayDay
+        dueDate.getFullYear() === today.getFullYear() &&
+        dueDate.getMonth() === today.getMonth() &&
+        dueDate.getDate() === today.getDate()
       ) {
         type = 'daily';
-      } else if (dueYear === thisMonthYear && dueMonth === thisMonthMonth) {
+      } else if (
+        dueDate.getFullYear() === today.getFullYear() &&
+        dueDate.getMonth() === today.getMonth()
+      ) {
         type = 'monthly';
       }
 
@@ -195,7 +229,10 @@ exports.getTodosWithType = (req, res) => {
     });
 
     res.json(todos);
-  });
+  } catch (error) {
+    console.error('Error fetching todos with type:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
 };
 
 // exports.createTodo = (req, res) => {
