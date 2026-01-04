@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { createNote, updateNote } from '../services/apiService';
-import API_URL from '../services/apiService';
 
 const CreateNote = () => {
   // const [title, setTitle] = useState('');
@@ -35,8 +34,10 @@ const CreateNote = () => {
   const extractedText = location.state?.extractedText || '';
   const extractedTitle = location.state?.extractedTitle || '';
 
+  const savedNoteId = sessionStorage.getItem('currentNoteId');
+
   const [note, setNote] = useState({
-    id: null, // will store noteId after first save
+    id: savedNoteId ? Number(savedNoteId) : null,
     title: extractedTitle,
     content: extractedText,
   });
@@ -60,6 +61,8 @@ const CreateNote = () => {
           title: note.title,
           content: note.content,
         });
+        sessionStorage.setItem('currentNoteId', response.noteId);
+
         // Store returned noteId
         setNote((prev) => ({ ...prev, id: response.noteId }));
       } else {
@@ -76,6 +79,12 @@ const CreateNote = () => {
     } finally {
       setIsSaving(false);
     }
+
+    useEffect(() => {
+      return () => {
+        sessionStorage.removeItem('currentNoteId');
+      };
+    }, []);
   };
 
   return (
