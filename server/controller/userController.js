@@ -183,19 +183,16 @@ const login = async (req, res) => {
 //   res.clearCookie('token'); // Remove the token stored in cookies
 //   res.json({message: 'Logout successful'});
 // };
+// Logout API for JWT
 const logout = async (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return res.status(500).json({ message: 'Logout failed' });
-    }
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ message: 'Could not destroy session' });
-      }
-      res.clearCookie('connect.sid'); // Clear session cookie
-      res.json({ message: 'Logout successful' });
-    });
-  });
+  try {
+    res.json({ message: 'Logout successful. Please remove token on client.' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ message: 'Logout failed' });
+  }
 };
+
+module.exports = { logout };
 
 module.exports = { login, register, logout };
