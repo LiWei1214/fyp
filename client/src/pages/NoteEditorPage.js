@@ -1,57 +1,106 @@
-import {useState, useEffect, useRef} from 'react';
-import {useParams, useNavigate, useLocation} from 'react-router-dom';
-import {createNote, updateNote, getNotes} from '../services/apiService';
-import {FiArrowLeft, FiSave} from 'react-icons/fi';
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { createNote, updateNote, getNotes } from '../services/apiService';
+import { FiArrowLeft, FiSave } from 'react-icons/fi';
 
 const NoteEditorPage = () => {
-  const {id} = useParams();
+  const { id: paramId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [note, setNote] = useState({title: '', content: ''});
+  const [note, setNote] = useState({ title: '', content: '' });
   const [isSaving, setIsSaving] = useState(false);
   const timeoutRef = useRef(null);
   const [saveMessage, setSaveMessage] = useState('');
   const messageTimeoutRef = useRef(null);
 
   useEffect(() => {
-    if (id !== 'new') {
-      fetchNote();
-    } else {
-      const extractedText = location.state?.extractedText || '';
-      const extractedTitle = location.state?.extractedTitle || '';
-      setNote({title: extractedTitle, content: extractedText});
-    }
-  }, [id, location.state]);
+    const initializeNote = async () => {
+      if (paramId && paramId !== 'new') {
+        try {
+          const allNotes = await getNotes();
+          const existingNote = allNotes.find(
+            (n) => Number(n.id) === Number(paramId)
+          );
+          if (existingNote) setNote(existingNote);
+        } catch (error) {
+          console.error('Error fetching note:', error);
+        }
+      } else {
+        const extractedText = location.state?.extractedText || '';
+        const extractedTitle = location.state?.extractedTitle || '';
+        setNote({ id: null, title: extractedTitle, content: extractedText });
+      }
+    };
+    initializeNote();
+  }, [paramId, location.state]);
 
-  const fetchNote = async () => {
-    try {
-      const allNotes = await getNotes();
-      const existingNote = allNotes.find(n => Number(n.id) === Number(id));
-      if (existingNote) setNote(existingNote);
-    } catch (error) {
-      console.error('Error fetching note:', error);
-    }
-  };
+  // const handleAutoSave = updatedContent => {
+  //   setIsSaving(true);
+  //   clearTimeout(timeoutRef.current);
+  //   timeoutRef.current = setTimeout(async () => {
+  //     try {
+  //       if (!note.title.trim() || !updatedContent.trim()) {
+  //         alert('Title and content are required.');
+  //         setIsSaving(false);
+  //         return;
+  //       }
 
-  const handleAutoSave = updatedContent => {
+  //       let response;
+  //       if (id === 'new') {
+  //         response = await createNote({
+  //           title: note.title,
+  //           content: updatedContent,
+  //         });
+  //       } else {
+  //         response = await updateNote(id, {
+  //           title: note.title,
+  //           content: updatedContent,
+  //         });
+  //       }
+
+  //       setIsSaving(false);
+  //       setSaveMessage('Saved ✓');
+  //       clearTimeout(messageTimeoutRef.current);
+  //       messageTimeoutRef.current = setTimeout(() => setSaveMessage(''), 3000);
+  //     } catch (error) {
+  //       alert('Error saving note.');
+  //       setIsSaving(false);
+  //       setSaveMessage('Failed ✗');
+  //       clearTimeout(messageTimeoutRef.current);
+  //       messageTimeoutRef.current = setTimeout(() => setSaveMessage(''), 3000);
+  //     }
+  //   }, 2000);
+  // };
+
+  const handleAutoSave = (updatedContent) => {
     setIsSaving(true);
     clearTimeout(timeoutRef.current);
+
     timeoutRef.current = setTimeout(async () => {
       try {
         if (!note.title.trim() || !updatedContent.trim()) {
-          alert('Title and content are required.');
           setIsSaving(false);
+          setSaveMessage('Title and content required ✗');
+          clearTimeout(messageTimeoutRef.current);
+          messageTimeoutRef.current = setTimeout(
+            () => setSaveMessage(''),
+            3000
+          );
           return;
         }
 
         let response;
-        if (id === 'new') {
+        if (!note.id) {
+          // First save -> create note
           response = await createNote({
             title: note.title,
             content: updatedContent,
           });
+          // Update note state with returned ID so future saves will UPDATE instead of CREATE
+          setNote((prev) => ({ ...prev, id: response.noteId }));
         } else {
-          response = await updateNote(id, {
+          // Existing note -> update
+          response = await updateNote(note.id, {
             title: note.title,
             content: updatedContent,
           });
@@ -62,7 +111,7 @@ const NoteEditorPage = () => {
         clearTimeout(messageTimeoutRef.current);
         messageTimeoutRef.current = setTimeout(() => setSaveMessage(''), 3000);
       } catch (error) {
-        alert('Error saving note.');
+        console.error('Error saving note:', error);
         setIsSaving(false);
         setSaveMessage('Failed ✗');
         clearTimeout(messageTimeoutRef.current);
@@ -71,10 +120,20 @@ const NoteEditorPage = () => {
     }, 2000);
   };
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const newContent = e.target.value;
-    setNote(prev => ({...prev, content: newContent}));
+    setNote((prev) => ({ ...prev, content: newContent }));
     handleAutoSave(newContent);
+  };
+
+  const handleTitleChange = (e) => {
+    const newTitle = e.target.value;
+    setNote((prev) => ({ ...prev, title: newTitle }));
+  };
+
+  const handleManualSave = () => {
+    clearTimeout(timeoutRef.current);
+    handleAutoSave(note.content);
   };
 
   return (
@@ -83,7 +142,8 @@ const NoteEditorPage = () => {
       <div className="flex justify-between items-center px-6 py-4 bg-white dark:bg-[#242424] shadow-md sticky top-0 z-10">
         <button
           onClick={() => navigate('/note')}
-          className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white flex items-center">
+          className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white flex items-center"
+        >
           <FiArrowLeft className="mr-2" /> Back
         </button>
         <div className="flex items-center gap-3">
@@ -96,7 +156,8 @@ const NoteEditorPage = () => {
               clearTimeout(timeoutRef.current);
               handleAutoSave(note.content);
             }}
-            className="flex items-center bg-blue-500 text-white px-5 py-2 rounded-lg hover:bg-blue-600 transition">
+            className="flex items-center bg-blue-500 text-white px-5 py-2 rounded-lg hover:bg-blue-600 transition"
+          >
             <FiSave className="mr-2" /> Save
           </button>
         </div>
@@ -110,8 +171,8 @@ const NoteEditorPage = () => {
             placeholder="Title"
             className="w-full text-3xl font-semibold p-3 text-black dark:text-white border-b border-gray-300 dark:border-gray-600 bg-transparent focus:ring-0 outline-none"
             value={note.title}
-            onChange={e => setNote({...note, title: e.target.value})}
-            onKeyDown={e => {
+            onChange={handleTitleChange}
+            onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
                 document.getElementById('noteContent').focus();

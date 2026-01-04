@@ -9,6 +9,7 @@ import { FiSearch, FiMoon, FiSun, FiSettings } from 'react-icons/fi';
 import NottieLogo from '../assets/NottieLogo.png';
 import Logo from '../assets/Logo.png';
 import { SearchContext } from '../context/SearchContext';
+import API_URL from '../services/apiService';
 
 const DashboardLayout = ({ children }) => {
   const { user } = useContext(UserContext);
