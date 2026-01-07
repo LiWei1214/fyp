@@ -537,9 +537,35 @@ exports.deleteList = async (req, res) => {
   }
 };
 
-exports.getAllMaterialsForStudents = (req, res) => {
-  db.query(
-    `
+// exports.getAllMaterialsForStudents = (req, res) => {
+//   db.query(
+//     `
+//       SELECT
+//         m.id,
+//         m.title,
+//         m.description,
+//         m.file_path,
+//         m.isQuizEnabled,
+//         c.name AS category_name
+//       FROM materials m
+//       JOIN categories c ON m.category_id = c.id
+//       ORDER BY m.created_at DESC
+//     `,
+//     (error, results) => {
+//       if (error) {
+//         console.error('Error fetching materials for students:', error);
+//         res
+//           .status(500)
+//           .json({ message: 'Failed to fetch materials', error: error.message });
+//       } else {
+//         res.status(200).json(results);
+//       }
+//     }
+//   );
+// };
+exports.getAllMaterialsForStudents = async (req, res) => {
+  try {
+    const sql = `
       SELECT
         m.id,
         m.title,
@@ -550,77 +576,133 @@ exports.getAllMaterialsForStudents = (req, res) => {
       FROM materials m
       JOIN categories c ON m.category_id = c.id
       ORDER BY m.created_at DESC
-    `,
-    (error, results) => {
-      if (error) {
-        console.error('Error fetching materials for students:', error);
-        res
-          .status(500)
-          .json({ message: 'Failed to fetch materials', error: error.message });
-      } else {
-        res.status(200).json(results);
-      }
-    }
-  );
+    `;
+
+    const result = await db.query(sql);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching materials for students:', error);
+    res.status(500).json({ message: 'Failed to fetch materials' });
+  }
 };
 
+// exports.getStudentQuizByMaterialId = async (req, res) => {
+//   const { materialId } = req.params;
+
+//   try {
+//     const [results] = await db.promise().query(
+//       `
+//       SELECT q.id AS quiz_id, qq.id AS question_id, qq.question_text, qq.options, qq.correct_answer
+//       FROM quizzes q
+//       JOIN quiz_questions qq ON q.id = qq.quiz_id
+//       WHERE q.material_id = ?
+//       `,
+//       [materialId]
+//     );
+
+//     if (results.length === 0) {
+//       return res
+//         .status(404)
+//         .json({ message: 'No quiz found for this material.' });
+//     }
+
+//     res.status(200).json(results);
+//   } catch (error) {
+//     console.error('Error fetching quiz by material ID:', error);
+//     res.status(500).json({ message: 'Failed to fetch quiz.', error });
+//   }
+// };
 exports.getStudentQuizByMaterialId = async (req, res) => {
   const { materialId } = req.params;
 
   try {
-    const [results] = await db.promise().query(
-      `
-      SELECT q.id AS quiz_id, qq.id AS question_id, qq.question_text, qq.options, qq.correct_answer
+    const sql = `
+      SELECT
+        q.id AS quiz_id,
+        qq.id AS question_id,
+        qq.question_text,
+        qq.options,
+        qq.correct_answer
       FROM quizzes q
       JOIN quiz_questions qq ON q.id = qq.quiz_id
-      WHERE q.material_id = ?
-      `,
-      [materialId]
-    );
+      WHERE q.material_id = $1
+    `;
 
-    if (results.length === 0) {
+    const result = await db.query(sql, [materialId]);
+
+    if (result.rows.length === 0) {
       return res
         .status(404)
         .json({ message: 'No quiz found for this material.' });
     }
 
-    res.status(200).json(results);
+    res.status(200).json(result.rows);
   } catch (error) {
     console.error('Error fetching quiz by material ID:', error);
-    res.status(500).json({ message: 'Failed to fetch quiz.', error });
+    res.status(500).json({ message: 'Failed to fetch quiz.' });
   }
 };
 
-exports.getQuizByCategoryForStudent = (req, res) => {
-  const materialId = req.params.materialId;
+// exports.getQuizByCategoryForStudent = (req, res) => {
+//   const materialId = req.params.materialId;
 
-  const quizQuery = `
-    SELECT qq.id, qq.question_text, qq.options, qq.correct_answer
-    FROM quiz_questions qq
-    JOIN quizzes q ON qq.quiz_id = q.id
-    JOIN materials m ON m.category_id = q.category_id
-    WHERE m.id = ?
-  `;
+//   const quizQuery = `
+//     SELECT qq.id, qq.question_text, qq.options, qq.correct_answer
+//     FROM quiz_questions qq
+//     JOIN quizzes q ON qq.quiz_id = q.id
+//     JOIN materials m ON m.category_id = q.category_id
+//     WHERE m.id = ?
+//   `;
 
-  db.query(quizQuery, [materialId], (error, results) => {
-    if (error) {
-      console.error('Error fetching quiz for student:', error);
-      return res.status(500).json({ message: 'Failed to fetch quiz', error });
-    }
+//   db.query(quizQuery, [materialId], (error, results) => {
+//     if (error) {
+//       console.error('Error fetching quiz for student:', error);
+//       return res.status(500).json({ message: 'Failed to fetch quiz', error });
+//     }
 
-    if (results.length === 0) {
+//     if (results.length === 0) {
+//       return res
+//         .status(404)
+//         .json({ message: 'No quiz available for this material.' });
+//     }
+
+//     const formatted = results.map((row) => ({
+//       id: row.id,
+//       question_text: row.question_text,
+//       options: JSON.parse(row.options),
+//       correct_answer: row.correct_answer,
+//     }));
+
+//     res.status(200).json(formatted);
+//   });
+// };
+exports.getQuizByCategoryForStudent = async (req, res) => {
+  const { materialId } = req.params;
+
+  try {
+    const sql = `
+      SELECT
+        qq.id,
+        qq.question_text,
+        qq.options,
+        qq.correct_answer
+      FROM quiz_questions qq
+      JOIN quizzes q ON qq.quiz_id = q.id
+      JOIN materials m ON m.category_id = q.category_id
+      WHERE m.id = $1
+    `;
+
+    const result = await db.query(sql, [materialId]);
+
+    if (result.rows.length === 0) {
       return res
         .status(404)
         .json({ message: 'No quiz available for this material.' });
     }
 
-    const formatted = results.map((row) => ({
-      id: row.id,
-      question_text: row.question_text,
-      options: JSON.parse(row.options),
-      correct_answer: row.correct_answer,
-    }));
-
-    res.status(200).json(formatted);
-  });
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching quiz for student:', error);
+    res.status(500).json({ message: 'Failed to fetch quiz' });
+  }
 };
