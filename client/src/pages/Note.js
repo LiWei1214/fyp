@@ -1,10 +1,11 @@
-import React, {useEffect, useContext, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {getNotes, deleteNote} from '../services/apiService';
+import React, { useEffect, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getNotes, deleteNote } from '../services/apiService';
 import DashboardLayout from '../components/DashboardLayout';
-import {FiTrash, FiPlus, FiChevronDown} from 'react-icons/fi';
-import {format} from 'date-fns';
-import {SearchContext} from '../context/SearchContext';
+import { FiTrash, FiPlus, FiChevronDown } from 'react-icons/fi';
+import { format } from 'date-fns';
+import { SearchContext } from '../context/SearchContext';
+import API_URL from '../services/apiService';
 
 const Note = () => {
   const [notes, setNotes] = useState([]);
@@ -12,7 +13,7 @@ const Note = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
-  const {searchQuery} = useContext(SearchContext);
+  const { searchQuery } = useContext(SearchContext);
 
   useEffect(() => {
     fetchNotes();
@@ -27,7 +28,7 @@ const Note = () => {
     }
   };
 
-  const handleDelete = async id => {
+  const handleDelete = async (id) => {
     await deleteNote(id);
     fetchNotes();
   };
@@ -37,7 +38,7 @@ const Note = () => {
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
 
-    fileInput.onchange = async event => {
+    fileInput.onchange = async (event) => {
       const file = event.target.files[0];
       if (file) {
         const formData = new FormData();
@@ -45,7 +46,7 @@ const Note = () => {
 
         try {
           setUploading(true);
-          const response = await fetch('http://localhost:5000/api/ocr', {
+          const response = await fetch(`${API_URL}/api/ocr`, {
             method: 'POST',
             body: formData,
           });
@@ -54,7 +55,7 @@ const Note = () => {
           setUploading(false);
           if (!data.text || !data.text.trim()) {
             alert(
-              'OCR is not detecting any text. Please upload a clear picture!',
+              'OCR is not detecting any text. Please upload a clear picture!'
             );
             return;
           }
@@ -75,10 +76,10 @@ const Note = () => {
     fileInput.click();
   };
 
-  const filteredNotes = notes.filter(note =>
+  const filteredNotes = notes.filter((note) =>
     `${note.title} ${note.content}`
       .toLowerCase()
-      .includes(searchQuery.toLowerCase()),
+      .includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -91,13 +92,15 @@ const Note = () => {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setShowDelete(!showDelete)}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+            >
               {showDelete ? 'Cancel' : 'Delete Notes'}
             </button>
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+              >
                 Create Note
                 <FiChevronDown className="ml-2" />
               </button>
@@ -107,12 +110,14 @@ const Note = () => {
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg overflow-hidden z-50">
                   <button
                     onClick={() => navigate('/notes/new')}
-                    className="block px-4 py-2 text-left w-full text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
+                    className="block px-4 py-2 text-left w-full text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
                     Create Note
                   </button>
                   <button
                     onClick={handleCreateNoteWithImage}
-                    className="block px-4 py-2 text-left w-full text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
+                    className="block px-4 py-2 text-left w-full text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
                     Create Note with Image
                   </button>
                 </div>
@@ -129,11 +134,13 @@ const Note = () => {
                 cy="12"
                 r="10"
                 stroke="currentColor"
-                strokeWidth="4"></circle>
+                strokeWidth="4"
+              ></circle>
               <path
                 className="opacity-75"
                 fill="currentColor"
-                d="M4 12a8 8 0 018-8v8z"></path>
+                d="M4 12a8 8 0 018-8v8z"
+              ></path>
             </svg>
             <span>Processing image...</span>
           </div>
@@ -143,14 +150,15 @@ const Note = () => {
             <p>No notes yet.</p>
             <button
               onClick={() => navigate('/notes/new')}
-              className="mt-4 inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+              className="mt-4 inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            >
               <FiPlus className="mr-2" /> Create your first note
             </button>
           </div>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredNotes.map(note => (
+          {filteredNotes.map((note) => (
             <div
               key={note.id}
               className={`group relative p-5 rounded-2xl transition-transform transform ${
@@ -158,7 +166,8 @@ const Note = () => {
               } bg-white dark:bg-gradient-to-br dark:from-[#2a2a2a] dark:to-[#1f1f1f] shadow-xl`}
               onClick={
                 !showDelete ? () => navigate(`/notes/${note.id}`) : undefined
-              }>
+              }
+            >
               <h3 className="text-xl font-bold text-gray-900 dark:text-white truncate">
                 {note.title || 'Untitled Note'}
               </h3>
@@ -171,26 +180,28 @@ const Note = () => {
                 {note.content || 'No content'}
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
-                {note.tags?.map(tag => (
+                {note.tags?.map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-200 rounded-full">
+                    className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-200 rounded-full"
+                  >
                     {tag}
                   </span>
                 ))}
               </div>
               {showDelete && (
                 <button
-                  onClick={e => {
+                  onClick={(e) => {
                     e.stopPropagation();
                     const confirmed = window.confirm(
-                      'Are you sure you want to delete this note?',
+                      'Are you sure you want to delete this note?'
                     );
                     if (confirmed) {
                       handleDelete(note.id);
                     }
                   }}
-                  className="absolute top-3 right-3 text-red-500 hover:text-red-700 transition">
+                  className="absolute top-3 right-3 text-red-500 hover:text-red-700 transition"
+                >
                   <FiTrash size={18} />
                 </button>
               )}
