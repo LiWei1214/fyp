@@ -1,14 +1,14 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import LecturerDashboardLayout from '../components/LecturerDashboardLayout';
-import {getUploadedMaterials, deleteMaterial} from '../services/apiService';
-import {Link} from 'react-router-dom';
-import {SearchContext} from '../context/SearchContext';
+import { getUploadedMaterials, deleteMaterial } from '../services/apiService';
+import { Link } from 'react-router-dom';
+import { SearchContext } from '../context/SearchContext';
 
 const LecturerDashboard = () => {
   const [uploadedMaterials, setUploadedMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const {searchQuery} = useContext(SearchContext);
+  const { searchQuery } = useContext(SearchContext);
 
   const fetchMaterials = async () => {
     try {
@@ -26,7 +26,7 @@ const LecturerDashboard = () => {
     fetchMaterials();
   }, []);
 
-  const handleDelete = async materialId => {
+  const handleDelete = async (materialId) => {
     if (window.confirm('Are you sure you want to delete this material?')) {
       try {
         const response = await deleteMaterial(materialId);
@@ -39,12 +39,12 @@ const LecturerDashboard = () => {
     }
   };
 
-  const filteredMaterials = uploadedMaterials.filter(material =>
+  const filteredMaterials = uploadedMaterials.filter((material) =>
     `${material.title} ${material.description || ''} ${
       material.category_name || ''
     }`
       .toLowerCase()
-      .includes(searchQuery.toLowerCase()),
+      .includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -78,10 +78,11 @@ const LecturerDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredMaterials.map(material => (
+                  {filteredMaterials.map((material) => (
                     <tr
                       key={material.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    >
                       <td className="px-6 py-4">{material.title}</td>
                       <td className="px-6 py-4">{material.category_name}</td>
                       <td className="px-6 py-4">
@@ -89,10 +90,11 @@ const LecturerDashboard = () => {
                       </td>
                       <td className="px-6 py-4">
                         <a
-                          href={`http://localhost:5000${material.file_path}`}
+                          href={`${API_URL}${material.file_path}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline">
+                          className="text-blue-500 hover:underline"
+                        >
                           View File
                         </a>
                       </td>
@@ -102,12 +104,14 @@ const LecturerDashboard = () => {
                       <td className="px-6 py-4 space-x-2">
                         <Link
                           to={`/lecturer-dashboard/edit-material/${material.id}`}
-                          className="inline-block px-4 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-full transition">
+                          className="inline-block px-4 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-full transition"
+                        >
                           Edit
                         </Link>
                         <button
                           onClick={() => handleDelete(material.id)}
-                          className="inline-block px-4 py-1 text-sm text-white bg-red-500 hover:bg-red-600 rounded-full transition">
+                          className="inline-block px-4 py-1 text-sm text-white bg-red-500 hover:bg-red-600 rounded-full transition"
+                        >
                           Delete
                         </button>
                       </td>
