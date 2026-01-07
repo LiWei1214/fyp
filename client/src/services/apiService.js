@@ -187,9 +187,16 @@ export const getUploadedMaterials = async () => {
     const response = await axiosInstance.get('/api/lecturer/materials', {
       headers: getAuthHeaders(),
     });
-    return response.data.materials; // Return the array of materials
+
+    // Support both response shapes safely
+    return Array.isArray(response.data)
+      ? response.data
+      : response.data.materials || [];
   } catch (error) {
-    console.error('Error fetching uploaded materials:', error);
+    console.error(
+      'Error fetching uploaded materials:',
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
