@@ -3,6 +3,7 @@ import LecturerDashboardLayout from '../components/LecturerDashboardLayout';
 import { getUploadedMaterials, deleteMaterial } from '../services/apiService';
 import { Link } from 'react-router-dom';
 import { SearchContext } from '../context/SearchContext';
+import API_URL from '../services/apiService';
 
 const LecturerDashboard = () => {
   const [uploadedMaterials, setUploadedMaterials] = useState([]);
