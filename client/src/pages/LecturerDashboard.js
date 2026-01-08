@@ -31,7 +31,7 @@ const LecturerDashboard = () => {
     if (window.confirm('Are you sure you want to delete this material?')) {
       try {
         const response = await deleteMaterial(materialId);
-        console.log(response.message);
+        // console.log(response.message);
         fetchMaterials();
       } catch (err) {
         console.error('Error deleting material:', err);
@@ -91,7 +91,7 @@ const LecturerDashboard = () => {
                       </td>
                       <td className="px-6 py-4">
                         <a
-                          href={`${API_URL}${material.file_path}`}
+                          href={`${material.file_path}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-500 hover:underline"

@@ -25,7 +25,7 @@ export const getNotes = async () => {
       headers: getAuthHeaders(),
     });
 
-    console.log('API Response (getNotes):', response.data);
+    // console.log('API Response (getNotes):', response.data);
     return response.data;
   } catch (error) {
     // console.error('Error fetching notes:', error);
@@ -45,7 +45,7 @@ export const getRecentNotes = async () => {
       headers: getAuthHeaders(),
     });
 
-    console.log('API Response (getRecentNotes):', response.data);
+    // console.log('API Response (getRecentNotes):', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching recent notes:', error);
