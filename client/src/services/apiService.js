@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-console.log('API_URL is:', API_URL); // Add this for debugging
+// console.log('API_URL is:', API_URL); // Add this for debugging
 
 export default API_URL;
 
