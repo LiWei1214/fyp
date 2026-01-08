@@ -102,19 +102,21 @@ const LecturerDashboard = () => {
                       <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
                         {material.description || '—'}
                       </td>
-                      <td className="px-6 py-4 space-x-2">
-                        <Link
-                          to={`/lecturer-dashboard/edit-material/${material.id}`}
-                          className="inline-block px-4 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-full transition"
-                        >
-                          Edit
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(material.id)}
-                          className="inline-block px-4 py-1 text-sm text-white bg-red-500 hover:bg-red-600 rounded-full transition"
-                        >
-                          Delete
-                        </button>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <Link
+                            to={`/lecturer-dashboard/edit-material/${material.id}`}
+                            className="px-3 py-1 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-full transition-colors duration-200"
+                          >
+                            Edit
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(material.id)}
+                            className="px-3 py-1 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-full transition-colors duration-200"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
