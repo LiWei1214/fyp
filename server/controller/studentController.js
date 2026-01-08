@@ -571,10 +571,13 @@ exports.getAllMaterialsForStudents = async (req, res) => {
         m.title,
         m.description,
         m.file_path,
-        m.isQuizEnabled,
-        c.name AS category_name
+        c.name AS category_name,
+        CASE
+          WHEN q.id IS NOT NULL THEN true
+          ELSE false
+        END AS isQuizEnabled
       FROM materials m
-      LEFT JOIN categories c ON m.category_id = c.id
+      JOIN categories c ON m.category_id = c.id
       LEFT JOIN quizzes q ON q.material_id = m.id
       ORDER BY m.created_at DESC
     `;
