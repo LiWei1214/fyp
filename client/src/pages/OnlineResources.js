@@ -240,7 +240,7 @@ const OnlineResources = () => {
                       View
                     </a>
                   )}
-                  {material.isQuizEnabled ? (
+                  {material.isquizenabled ? (
                     <Link
                       to={`/student/quiz/${material.id}`}
                       className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-1.5 rounded-full"
