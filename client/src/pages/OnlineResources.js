@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect, useRef} from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import {
   getMaterials,
@@ -7,8 +7,8 @@ import {
   saveUserCategories,
   deleteUserCategory,
 } from '../services/apiService';
-import {Link} from 'react-router-dom';
-import {SearchContext} from '../context/SearchContext';
+import { Link } from 'react-router-dom';
+import { SearchContext } from '../context/SearchContext';
 
 const OnlineResources = () => {
   const [materials, setMaterials] = useState([]);
@@ -20,12 +20,12 @@ const OnlineResources = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const dropdownRef = useRef(null);
-  const {searchQuery} = useContext(SearchContext);
+  const { searchQuery } = useContext(SearchContext);
 
   const fetchUserCategoriesAndRefresh = async () => {
     const updatedUserCategories = await getUserCategories();
     setUserCategories(updatedUserCategories);
-    setSelectedCategoryIds(updatedUserCategories.map(cat => cat.id));
+    setSelectedCategoryIds(updatedUserCategories.map((cat) => cat.id));
   };
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const OnlineResources = () => {
         ]);
         setCategories(allCategories);
         setUserCategories(selectedCategories);
-        setSelectedCategoryIds(selectedCategories.map(cat => cat.id));
+        setSelectedCategoryIds(selectedCategories.map((cat) => cat.id));
         setLoading(false);
       } catch (err) {
         console.error('Error loading categories:', err);
@@ -66,7 +66,7 @@ const OnlineResources = () => {
   }, [selectedCategoryIds]);
 
   useEffect(() => {
-    const handleClickOutside = event => {
+    const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
@@ -89,22 +89,22 @@ const OnlineResources = () => {
     }
   };
 
-  const handleCategoryFilterClick = id => {
+  const handleCategoryFilterClick = (id) => {
     if (id === 'all') {
       if (selectedCategoryIds.length === userCategories.length) {
         setSelectedCategoryIds([]);
       } else {
-        const allIds = userCategories.map(cat => cat.id);
+        const allIds = userCategories.map((cat) => cat.id);
         setSelectedCategoryIds(allIds);
       }
     } else {
-      setSelectedCategoryIds(prev =>
-        prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id],
+      setSelectedCategoryIds((prev) =>
+        prev.includes(id) ? prev.filter((cid) => cid !== id) : [...prev, id]
       );
     }
   };
 
-  const handleCategoryRemove = async id => {
+  const handleCategoryRemove = async (id) => {
     try {
       await deleteUserCategory(id);
       await fetchUserCategoriesAndRefresh();
@@ -114,12 +114,12 @@ const OnlineResources = () => {
     }
   };
 
-  const isSelected = id => newCategoryIds.includes(id);
+  const isSelected = (id) => newCategoryIds.includes(id);
 
-  const filteredMaterials = materials.filter(material =>
+  const filteredMaterials = materials.filter((material) =>
     `${material.title} ${material.description || ''}`
       .toLowerCase()
-      .includes(searchQuery.toLowerCase()),
+      .includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -131,27 +131,31 @@ const OnlineResources = () => {
           </h2>
           <div className="relative" ref={dropdownRef}>
             <button
-              onClick={() => setDropdownOpen(prev => !prev)}
-              className="p-2 rounded-xl bg-[#ECEFF1] hover:bg-[#E0E0E0] dark:bg-gray-700 dark:hover:bg-gray-600 border border-[#E0E0E0] dark:border-gray-600">
+              onClick={() => setDropdownOpen((prev) => !prev)}
+              className="p-2 rounded-xl bg-[#ECEFF1] hover:bg-[#E0E0E0] dark:bg-gray-700 dark:hover:bg-gray-600 border border-[#E0E0E0] dark:border-gray-600"
+            >
               + Categories
             </button>
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-64 bg-[#FAFAFA] dark:bg-gray-800 border border-[#E0E0E0] dark:border-gray-600 rounded-xl shadow-xl z-10">
                 <div className="max-h-64 overflow-y-auto p-4 space-y-2">
                   {categories
-                    .filter(cat => !userCategories.find(uc => uc.id === cat.id))
-                    .map(cat => (
+                    .filter(
+                      (cat) => !userCategories.find((uc) => uc.id === cat.id)
+                    )
+                    .map((cat) => (
                       <label
                         key={cat.id}
-                        className="flex items-center gap-2 text-sm text-[#4A4A4A] dark:text-white">
+                        className="flex items-center gap-2 text-sm text-[#4A4A4A] dark:text-white"
+                      >
                         <input
                           type="checkbox"
                           checked={isSelected(cat.id)}
                           onChange={() =>
-                            setNewCategoryIds(prev =>
+                            setNewCategoryIds((prev) =>
                               isSelected(cat.id)
-                                ? prev.filter(id => id !== cat.id)
-                                : [...prev, cat.id],
+                                ? prev.filter((id) => id !== cat.id)
+                                : [...prev, cat.id]
                             )
                           }
                         />
@@ -163,7 +167,8 @@ const OnlineResources = () => {
                   <div className="p-4 border-t border-[#E0E0E0] dark:border-gray-600">
                     <button
                       onClick={handleCategorySave}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-semibold">
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-semibold"
+                    >
                       Save Selected
                     </button>
                   </div>
@@ -181,11 +186,12 @@ const OnlineResources = () => {
               selectedCategoryIds.length === userCategories.length
                 ? 'bg-blue-600 text-white'
                 : 'bg-[#FAFAFA] dark:bg-gray-700 border-[#E0E0E0] text-[#1C1C1E] dark:text-white hover:bg-[#ECEFF1]'
-            }`}>
+            }`}
+          >
             All
           </button>
 
-          {userCategories.map(cat => (
+          {userCategories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => handleCategoryFilterClick(cat.id)}
@@ -195,7 +201,8 @@ const OnlineResources = () => {
                   ? 'bg-blue-500 text-white'
                   : 'bg-[#FAFAFA] dark:bg-gray-700 border-[#E0E0E0] text-[#1C1C1E] dark:text-white hover:bg-[#ECEFF1]'
               }`}
-              title="Double click to remove">
+              title="Double click to remove"
+            >
               {cat.name}
             </button>
           ))}
@@ -208,10 +215,11 @@ const OnlineResources = () => {
           <p className="text-red-500">{error}</p>
         ) : materials.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMaterials.map(material => (
+            {filteredMaterials.map((material) => (
               <div
                 key={material.id}
-                className="bg-[#FAFAFA] dark:bg-gray-800 border border-[#E0E0E0] dark:border-gray-700 rounded-2xl p-5 shadow hover:shadow-lg transition-all">
+                className="bg-[#FAFAFA] dark:bg-gray-800 border border-[#E0E0E0] dark:border-gray-700 rounded-2xl p-5 shadow hover:shadow-lg transition-all"
+              >
                 <h3 className="text-xl font-semibold text-[#1C1C1E] dark:text-white mb-2">
                   {material.title}
                 </h3>
@@ -224,17 +232,19 @@ const OnlineResources = () => {
                 <div className="flex flex-wrap gap-2">
                   {material.file_path && (
                     <a
-                      href={`http://localhost:5000${material.file_path}`}
+                      href={`${material.file_path}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-1.5 rounded-full">
+                      className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-1.5 rounded-full"
+                    >
                       View
                     </a>
                   )}
                   {material.isQuizEnabled ? (
                     <Link
                       to={`/student/quiz/${material.id}`}
-                      className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-1.5 rounded-full">
+                      className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-1.5 rounded-full"
+                    >
                       Take Quiz
                     </Link>
                   ) : (
