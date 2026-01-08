@@ -574,7 +574,8 @@ exports.getAllMaterialsForStudents = async (req, res) => {
         m.isQuizEnabled,
         c.name AS category_name
       FROM materials m
-      JOIN categories c ON m.category_id = c.id
+      LEFT JOIN categories c ON m.category_id = c.id
+      LEFT JOIN quizzes q ON q.material_id = m.id
       ORDER BY m.created_at DESC
     `;
 
